@@ -14,7 +14,7 @@ bazel_dep(name = "rules_pkg", version = "1.2.0")
 
 git_override(
     module_name = "rules_flux_deploy",
-    commit = "f7b2165900cf9133e2b387e81e0939859fc971ce",
+    commit = "1cbf7a256d46936c6c4c9b3723f01d6da53a87cd",
     remote = "https://github.com/adiom-data/bazel-rules.git",
 )
 

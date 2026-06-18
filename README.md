@@ -32,6 +32,7 @@ bazel build //deploy:infra_deploy
 bazel build //deploy:migration_deploy
 bazel build //deploy:app_deploy
 bazel run //deploy:publish_all
+bazel run //deploy:publish_preview_all
 ```
 
 The gateway base image is pinned from `ghcr.io/adiom-data/components/gateway:v0.0.1`

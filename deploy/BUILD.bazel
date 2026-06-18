@@ -70,6 +70,32 @@ image_kustomization(
     stamp = True,
 )
 
+image_kustomization(
+    name = "migration_deploy_preview",
+    artifact_suffix = "sample-app-migration-deploy",
+    bundle_name = "migration",
+    force = True,
+    images = [":migrate_image"],
+    repository_prefix_override_all = "{STABLE_PREVIEW_REFERENCE_PREFIX}",
+    source_prefix = "deploy/migrations",
+    srcs = [":migration_srcs"],
+    stamp = True,
+)
+
+image_kustomization(
+    name = "app_deploy_preview",
+    artifact_suffix = "sample-app-deploy",
+    bundle_name = "app",
+    images = [
+        ":api_image",
+        ":gateway_image",
+    ],
+    repository_prefix_override_all = "{STABLE_PREVIEW_REFERENCE_PREFIX}",
+    source_prefix = "deploy/app",
+    srcs = [":app_srcs"],
+    stamp = True,
+)
+
 publish_bundle_set(
     name = "publish",
     bundles = [
@@ -85,5 +111,16 @@ publish_bundle_set(
     ],
     skip_existing = True,
     source = "https://github.com/adiom-data/sample-app",
+    stamp = True,
+)
+
+publish_bundle_set(
+    name = "publish_preview",
+    artifact_prefix = "{STABLE_PREVIEW_REFERENCE_PREFIX}",
+    bundles = [
+        ":infra_deploy",
+        ":migration_deploy_preview",
+        ":app_deploy_preview",
+    ],
     stamp = True,
 )
