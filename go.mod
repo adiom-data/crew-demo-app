@@ -4,7 +4,7 @@ go 1.25.7
 
 require (
 	connectrpc.com/connect v1.19.2
-	github.com/adiom-data/framework v0.0.0-20260618063058-377a7aa3f3e0
+	github.com/adiom-data/framework v0.0.0-20260626223030-db6f4346cc35
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/jackc/pgx/v5 v5.9.2
 	golang.org/x/oauth2 v0.36.0

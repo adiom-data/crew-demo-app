@@ -30,6 +30,7 @@ type environment struct {
 	PGSSLMode  string `env:"PGSSLMODE" envDefault:"disable"`
 
 	PublicBaseURL        string   `env:"PUBLIC_BASE_URL"`
+	ProxyRedirectURL     string   `env:"PROXY_REDIRECT_URL"`
 	AuthIssuer           string   `env:"AUTH_ISSUER,required"`
 	AuthKeyID            string   `env:"AUTH_KEY_ID" envDefault:"sample-auth-2026-06"`
 	AuthPrivateKeyBase64 string   `env:"AUTH_PRIVATE_KEY_BASE64,required"`
@@ -58,6 +59,7 @@ func configFromEnv() (api.Config, error) {
 		},
 		Auth: api.AuthConfig{
 			PublicBaseURL:    strings.TrimRight(e.PublicBaseURL, "/"),
+			ProxyRedirectURL: strings.TrimRight(e.ProxyRedirectURL, "/"),
 			IssuerURL:        e.AuthIssuer,
 			KeyID:            e.AuthKeyID,
 			PrivateKeyBase64: e.AuthPrivateKeyBase64,

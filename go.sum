@@ -6,8 +6,8 @@ connectrpc.com/grpcreflect v1.3.0 h1:Y4V+ACf8/vOb1XOc251Qun7jMB75gCUNw6llvB9csXc
 connectrpc.com/grpcreflect v1.3.0/go.mod h1:nfloOtCS8VUQOQ1+GTdFzVg2CJo4ZGaat8JIovCtDYs=
 connectrpc.com/otelconnect v0.9.0 h1:NggB3pzRC3pukQWaYbRHJulxuXvmCKCKkQ9hbrHAWoA=
 connectrpc.com/otelconnect v0.9.0/go.mod h1:AEkVLjCPXra+ObGFCOClcJkNjS7zPaQSqvO0lCyjfZc=
-github.com/adiom-data/framework v0.0.0-20260618063058-377a7aa3f3e0 h1:qlZ+Wczb4XfEPegXTkIFcVoq9l7bR6x1dykO2qSE12A=
-github.com/adiom-data/framework v0.0.0-20260618063058-377a7aa3f3e0/go.mod h1:Rokhq2vLLO5+YRo+hEJBEGqppemONJFGqeV1Ju93FL0=
+github.com/adiom-data/framework v0.0.0-20260626223030-db6f4346cc35 h1:vbV9nrSX07QuLQqeE2hGklXbWpwenhR4Ngwao1OoZTQ=
+github.com/adiom-data/framework v0.0.0-20260626223030-db6f4346cc35/go.mod h1:Rokhq2vLLO5+YRo+hEJBEGqppemONJFGqeV1Ju93FL0=
 github.com/caarlos0/env/v11 v11.4.1 h1:fYwH0sWEsBSMPG7t4e/PEfTFzrWrpjyygXyUnWiSwEw=
 github.com/caarlos0/env/v11 v11.4.1/go.mod h1:qupehSf/Y0TUTsxKywqRt/vJjN5nz6vauiYEUUr8P4U=
 github.com/cenkalti/backoff/v5 v5.0.3 h1:ZN+IMa753KfX5hd8vVaMixjnqRZ3y8CuJKRKj1xcsSM=

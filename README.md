@@ -44,7 +44,8 @@ The migration image layers service SQL onto
 For browser OIDC auth, configure `AUTH_ISSUER`, `OIDC_ISSUER`,
 `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `AUTH_PRIVATE_KEY_BASE64`,
 and `AUTH_STATE_KEY_BASE64`. The API fails startup when required auth
-configuration is missing or invalid.
+configuration is missing or invalid. Preview environments may set the full
+provider callback URL with `PROXY_REDIRECT_URL`.
 For native/mobile credential exchange, expose `adiom.auth.v1.AuthService` and
 set `OIDC_ALLOWED_AUDIENCES` to include any additional client IDs that may
 present provider ID tokens.
@@ -65,12 +66,14 @@ Bootstrap `sample-app-auth` with these keys:
   Ed25519 seed used to sign app tokens.
 - `AUTH_STATE_KEY_BASE64`: base64-encoded 32 random bytes. This is the stable
   browser OAuth state seed used across API replicas.
+- `PROXY_REDIRECT_URL`: optional full preview proxy callback URL used for
+  browser OAuth redirects.
 - `OIDC_ALLOWED_AUDIENCES`: optional comma-separated additional OIDC client IDs
   allowed to exchange provider ID tokens, usually native/mobile client IDs.
 
 For the Google OAuth web client, configure the authorized redirect URI as
-`https://<app-hostname>/auth/callback`, matching the public hostname that
-serves this app.
+`https://<app-hostname>/auth/callback`, or
+`<PROXY_REDIRECT_URL>` for preview environments.
 
 Generate the app-owned random secrets as stable values:
 
@@ -101,6 +104,8 @@ stringData:
   OIDC_CLIENT_SECRET: <web-oauth-client-secret>
   AUTH_PRIVATE_KEY_BASE64: <base64-32-random-bytes>
   AUTH_STATE_KEY_BASE64: <base64-32-random-bytes>
+  # Optional for preview environments.
+  PROXY_REDIRECT_URL: https://<preview-proxy-hostname>/callback
   # Optional; omit when only the web client exchanges provider ID tokens.
   OIDC_ALLOWED_AUDIENCES: <comma-separated-client-ids>
 ```
@@ -144,10 +149,13 @@ are handled at request time so the service can recover when Postgres returns.
 
 The checked-in Kubernetes resources intentionally omit `metadata.namespace` and
 `HTTPRoute.hostnames`, so the bundle can be applied to any namespace and bound
-to hostnames by the environment. If `PUBLIC_BASE_URL` is not set, browser auth
-uses the framework request-scoped redirect resolver to derive its OAuth
-redirect base URL from forwarded request host/proto headers; auth requests fail
-if the gateway does not provide a usable host.
+to hostnames by the environment. If `PROXY_REDIRECT_URL` is set, browser auth
+uses it as the stable provider callback URL in preview environments while the
+framework stores the final app callback URL in OAuth state. Otherwise
+`PUBLIC_BASE_URL` is used when set. If neither value is set, browser auth uses
+the framework request-scoped redirect resolver to derive its OAuth redirect
+base URL from forwarded request host/proto headers; auth requests fail if the
+gateway does not provide a usable host.
 
 Observability is provider-owned. Framework telemetry emits traces and metrics
 to the namespace collector default `http://otel-collector:4318`. The sample

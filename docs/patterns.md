@@ -190,11 +190,15 @@ Every Job in the forced `migration` bundle must be idempotent.
 - The process should fail startup when required auth configuration is missing
   or invalid. It should not silently disable browser auth or generate ephemeral
   signing keys in shared deploys.
-- If `PUBLIC_BASE_URL` is not configured, browser auth should use the framework
-  request-scoped redirect resolver to derive redirect URLs from forwarded
-  host/proto headers. Auth requests should fail rather than use a fake fallback
-  URL when those headers are unavailable. Production-like environments should
-  prefer an explicit public base URL when one is available.
+- Browser OAuth should pass `PROXY_REDIRECT_URL` to the framework in preview
+  environments so the provider uses a stable proxy callback while the app
+  callback remains request-scoped state. Otherwise use `PUBLIC_BASE_URL` when
+  configured.
+- If neither explicit redirect base is configured, browser auth should use the
+  framework request-scoped redirect resolver to derive redirect URLs from
+  forwarded host/proto headers. Auth requests should fail rather than use a fake
+  fallback URL when those headers are unavailable. Production-like environments
+  should prefer an explicit public base URL when one is available.
 - Auth/session tables are service-owned schema. In this sample they live with
   the app database migrations because the API and auth services share one
   deployable binary and database.

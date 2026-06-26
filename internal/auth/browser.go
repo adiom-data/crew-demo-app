@@ -44,6 +44,7 @@ func browserAuthHandler(ctx context.Context, db *sql.DB, authorizer frameworkaut
 		ClientID:            cfg.OIDC.ClientID,
 		ClientSecret:        cfg.OIDC.ClientSecret,
 		RedirectURL:         redirectURL,
+		ProxyRedirectURL:    cfg.ProxyRedirectURL,
 		RedirectURLResolver: redirectURLResolver,
 		// These options assume Google browser auth. Other OIDC providers may
 		// use different parameters or rely on provider-side client config.

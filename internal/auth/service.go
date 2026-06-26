@@ -20,6 +20,7 @@ type Service struct {
 
 type Config struct {
 	PublicBaseURL    string
+	ProxyRedirectURL string
 	IssuerURL        string
 	KeyID            string
 	PrivateKeyBase64 string
@@ -30,6 +31,7 @@ type Config struct {
 
 func New(ctx context.Context, db *sql.DB, cfg Config) (*Service, error) {
 	cfg.PublicBaseURL = strings.TrimRight(cfg.PublicBaseURL, "/")
+	cfg.ProxyRedirectURL = strings.TrimRight(strings.TrimSpace(cfg.ProxyRedirectURL), "/")
 	cfg.IssuerURL = strings.TrimRight(strings.TrimSpace(cfg.IssuerURL), "/")
 	issuer, err := tokenIssuer(cfg)
 	if err != nil {
