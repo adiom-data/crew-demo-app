@@ -47,6 +47,17 @@ spec:
                 exit 0
               fi
 
+              role_exists="$(
+                psql -v ON_ERROR_STOP=1 -v role="$APP_DATABASE_OWNER" -At <<'SQL'
+              select 1 from pg_roles where rolname = :'role';
+              SQL
+              )"
+              if [ "$role_exists" != "1" ]; then
+                psql -v ON_ERROR_STOP=1 -v role="$APP_DATABASE_OWNER" <<'SQL'
+              create role :"role" login;
+              SQL
+              fi
+
               psql -v ON_ERROR_STOP=1 -v db="$APP_DATABASE" -v owner="$APP_DATABASE_OWNER" <<'SQL'
               create database :"db" owner :"owner";
               SQL

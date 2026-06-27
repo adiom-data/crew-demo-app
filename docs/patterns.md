@@ -30,6 +30,8 @@ names for changed Jobs.
   bundles through `adiom-data/bazel-rules`.
 - Deploy is split into three ordered bundles:
   - `infra`: long-lived infrastructure, currently the CloudNativePG cluster.
+  - `preview_infra`: disposable preview infrastructure, currently a plain
+    Postgres Deployment backed by `emptyDir` to avoid per-preview PVCs.
   - `migration`: rerunnable Kubernetes Jobs for database setup and schema
     migrations.
   - `app`: runtime workloads, currently the API and gateway.
@@ -38,6 +40,9 @@ names for changed Jobs.
   their scripts or images change.
 - Do not put long-lived resources like the Postgres `Cluster` in a forced
   bundle.
+- Preview publish targets may swap the long-lived infra bundle for
+  preview-specific disposable infrastructure, but should keep the same service
+  and secret names consumed by migration and app bundles.
 - User-facing Deployments should run at least two replicas with
   `maxUnavailable: 0`, `maxSurge: 1`, and readiness probes so normal rolling
   updates keep an old ready pod serving until a new pod is ready.
@@ -76,6 +81,9 @@ Every Job in the forced `migration` bundle must be idempotent.
   database itself a CNPG bootstrap artifact.
 - CNPG superuser access is enabled so the operator generates
   `sample-postgres-superuser`.
+- Preview infra may replace CNPG with disposable Postgres, but the deployment
+  environment must still provide DB credential secrets compatible with the
+  shared migration and app bundles.
 - Database creation Jobs connect with the generated superuser secret.
 - Application workloads and schema migration Jobs connect with the generated
   app secret.

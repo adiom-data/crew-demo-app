@@ -11,6 +11,11 @@ filegroup(
 )
 
 filegroup(
+    name = "preview_infra_srcs",
+    srcs = glob(["preview-infra/**"]),
+)
+
+filegroup(
     name = "migration_srcs",
     srcs = glob(["migrations/**"]),
 )
@@ -42,6 +47,14 @@ image_kustomization(
     bundle_name = "infra",
     source_prefix = "deploy/infra",
     srcs = [":infra_srcs"],
+)
+
+image_kustomization(
+    name = "preview_infra_deploy",
+    artifact_suffix = "sample-app-preview-infra-deploy",
+    bundle_name = "infra",
+    source_prefix = "deploy/preview-infra",
+    srcs = [":preview_infra_srcs"],
 )
 
 image_kustomization(
@@ -85,7 +98,7 @@ publish_bundle_set(
 publish_bundle_set(
     name = "publish_preview",
     bundles = [
-        ":infra_deploy",
+        ":preview_infra_deploy",
         ":migration_deploy",
         ":app_deploy",
     ],
