@@ -8,7 +8,7 @@ go_library(
     srcs = [
         "main.go",
     ],
-    importpath = "github.com/adiom-data/sample-app/cmd/api",
+    importpath = "github.com/adiom-data/crew-demo-app/cmd/api",
     visibility = ["//visibility:private"],
     deps = [
         "//internal/api",
@@ -52,12 +52,12 @@ oci_image(
 oci_load(
     name = "load",
     image = ":image",
-    repo_tags = ["sample-app-api:latest"],
+    repo_tags = ["crew-demo-app-api:latest"],
 )
 
 oci_push(
     name = "push",
     image = ":image",
     remote_tags = ["latest"],
-    repository = "ghcr.io/adiom-data/sample-app-api",
+    repository = "ghcr.io/adiom-data/crew-demo-app-api",
 )

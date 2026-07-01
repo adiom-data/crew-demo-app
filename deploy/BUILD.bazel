@@ -23,27 +23,27 @@ filegroup(
 deploy_image(
     name = "api_image",
     image = "//cmd/api:image",
-    repository_suffix = "sample-app-api",
-    yaml_ref = "ghcr.io/adiom-data/sample-app-api",
+    repository_suffix = "crew-demo-app-api",
+    yaml_ref = "ghcr.io/adiom-data/crew-demo-app-api",
 )
 
 deploy_image(
     name = "gateway_image",
     image = "//services/gateway:image",
-    repository_suffix = "sample-app-gateway",
-    yaml_ref = "ghcr.io/adiom-data/sample-app-gateway",
+    repository_suffix = "crew-demo-app-gateway",
+    yaml_ref = "ghcr.io/adiom-data/crew-demo-app-gateway",
 )
 
 deploy_image(
     name = "migrate_image",
     image = "//cmd/migrate:image",
-    repository_suffix = "sample-app-migrate",
-    yaml_ref = "ghcr.io/adiom-data/sample-app-migrate",
+    repository_suffix = "crew-demo-app-migrate",
+    yaml_ref = "ghcr.io/adiom-data/crew-demo-app-migrate",
 )
 
 image_kustomization(
     name = "infra_deploy",
-    artifact_suffix = "sample-app-infra-deploy",
+    artifact_suffix = "crew-demo-app-infra-deploy",
     bundle_name = "infra",
     source_prefix = "deploy/infra",
     srcs = [":infra_srcs"],
@@ -51,7 +51,7 @@ image_kustomization(
 
 image_kustomization(
     name = "preview_infra_deploy",
-    artifact_suffix = "sample-app-preview-infra-deploy",
+    artifact_suffix = "crew-demo-app-preview-infra-deploy",
     bundle_name = "infra",
     source_prefix = "deploy/preview-infra",
     srcs = [":preview_infra_srcs"],
@@ -59,7 +59,7 @@ image_kustomization(
 
 image_kustomization(
     name = "migration_deploy",
-    artifact_suffix = "sample-app-migration-deploy",
+    artifact_suffix = "crew-demo-app-migration-deploy",
     bundle_name = "migration",
     force = True,
     images = [":migrate_image"],
@@ -71,7 +71,7 @@ image_kustomization(
 
 image_kustomization(
     name = "app_deploy",
-    artifact_suffix = "sample-app-deploy",
+    artifact_suffix = "crew-demo-app-deploy",
     bundle_name = "app",
     images = [
         ":api_image",

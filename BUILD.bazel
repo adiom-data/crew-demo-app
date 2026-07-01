@@ -1,7 +1,7 @@
 load("@gazelle//:def.bzl", "gazelle")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
-# gazelle:prefix github.com/adiom-data/sample-app
+# gazelle:prefix github.com/adiom-data/crew-demo-app
 
 gazelle(name = "gazelle")
 

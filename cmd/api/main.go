@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/adiom-data/sample-app/internal/api"
+	"github.com/adiom-data/crew-demo-app/internal/api"
 	"github.com/caarlos0/env/v11"
 )
 

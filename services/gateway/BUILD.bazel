@@ -30,5 +30,5 @@ oci_image(
 oci_load(
     name = "load",
     image = ":image",
-    repo_tags = ["sample-app-gateway:latest"],
+    repo_tags = ["crew-demo-app-gateway:latest"],
 )

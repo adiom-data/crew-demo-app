@@ -1,5 +1,5 @@
 module(
-    name = "sample_app",
+    name = "crew_demo_app",
     version = "0.0.0",
 )
 

@@ -1,4 +1,4 @@
-module github.com/adiom-data/sample-app
+module github.com/adiom-data/crew-demo-app
 
 go 1.25.7
 

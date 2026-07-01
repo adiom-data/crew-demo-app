@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "db",
     srcs = ["users.go"],
-    importpath = "github.com/adiom-data/sample-app/internal/auth/db",
+    importpath = "github.com/adiom-data/crew-demo-app/internal/auth/db",
     visibility = ["//internal/auth:__pkg__"],
 )

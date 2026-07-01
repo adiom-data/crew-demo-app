@@ -291,7 +291,7 @@
     "@@rules_flux_deploy+//flux_deploy:extensions.bzl%flux_deploy_dependencies": {
       "general": {
         "bzlTransitiveDigest": "Fdjaqk941zdW/qCz64dt5Y2HbqTl7NCwNE0k42S8RC8=",
-        "usagesDigest": "kxVXqNjzs0jqduJAeKGlc5bzVIhFV8ZV7NFq36DrgdA=",
+        "usagesDigest": "T8geaHIbX49HxOVxgVTkAGOlNYR//0RxO/8N420SPSQ=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "rules_flux_deploy_tools": {
@@ -361,7 +361,7 @@
     "@@rules_nodejs+//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "oZFClfRhTTwsYzpxVPkOpOt/r0+OzEfEV37au0jFZ0s=",
-        "usagesDigest": "IklckXYdkgj8HGJO5AOkdCUU87JaCywmAuWiqPggzg0=",
+        "usagesDigest": "c3xOQnslqQuIpyDDonMU8dl8fjgUrO+/l05wP2cdrXo=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "nodejs_linux_amd64": {

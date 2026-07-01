@@ -6,10 +6,10 @@ import (
 
 	"github.com/adiom-data/framework/auth/tokenissuer"
 	"github.com/adiom-data/framework/httpapp"
-	samplev1 "github.com/adiom-data/sample-app/gen/go/sample/v1"
-	"github.com/adiom-data/sample-app/gen/go/sample/v1/samplev1connect"
-	apidb "github.com/adiom-data/sample-app/internal/api/db"
-	appauth "github.com/adiom-data/sample-app/internal/auth"
+	samplev1 "github.com/adiom-data/crew-demo-app/gen/go/sample/v1"
+	"github.com/adiom-data/crew-demo-app/gen/go/sample/v1/samplev1connect"
+	apidb "github.com/adiom-data/crew-demo-app/internal/api/db"
+	appauth "github.com/adiom-data/crew-demo-app/internal/auth"
 )
 
 type Config struct {

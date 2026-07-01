@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	frameworkauth "github.com/adiom-data/framework/auth"
-	authdb "github.com/adiom-data/sample-app/internal/auth/db"
+	authdb "github.com/adiom-data/crew-demo-app/internal/auth/db"
 )
 
 type dbAuthorizer struct {

@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sample-postgres
+  name: crew-demo-postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: sample-postgres
+      app.kubernetes.io/name: crew-demo-postgres
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: sample-postgres
+        app.kubernetes.io/name: crew-demo-postgres
     spec:
       securityContext:
         runAsNonRoot: true

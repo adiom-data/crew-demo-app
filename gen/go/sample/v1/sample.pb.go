@@ -257,7 +257,7 @@ const file_sample_v1_sample_proto_rawDesc = "" +
 	"\x05error\x18\x02 \x01(\tR\x05error2Z\n" +
 	"\rSampleService\x12I\n" +
 	"\n" +
-	"GetSession\x12\x1c.sample.v1.GetSessionRequest\x1a\x1d.sample.v1.GetSessionResponseB<Z:github.com/adiom-data/sample-app/gen/go/sample/v1;samplev1b\x06proto3"
+	"GetSession\x12\x1c.sample.v1.GetSessionRequest\x1a\x1d.sample.v1.GetSessionResponseB?Z=github.com/adiom-data/crew-demo-app/gen/go/sample/v1;samplev1b\x06proto3"
 
 var (
 	file_sample_v1_sample_proto_rawDescOnce sync.Once

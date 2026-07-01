@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "samplev1connect",
     srcs = ["sample.connect.go"],
-    importpath = "github.com/adiom-data/sample-app/gen/go/sample/v1/samplev1connect",
+    importpath = "github.com/adiom-data/crew-demo-app/gen/go/sample/v1/samplev1connect",
     visibility = ["//visibility:public"],
     deps = [
         "//gen/go/sample/v1:samplev1",

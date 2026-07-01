@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sample-api
+  name: crew-demo-api
 spec:
   replicas: 2
   minReadySeconds: 5
@@ -12,11 +12,11 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: sample-api
+      app.kubernetes.io/name: crew-demo-api
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: sample-api
+        app.kubernetes.io/name: crew-demo-api
     spec:
       securityContext:
         runAsNonRoot: true
@@ -27,66 +27,66 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: ghcr.io/adiom-data/sample-app-api:latest
+          image: ghcr.io/adiom-data/crew-demo-app-api:latest
           ports:
             - containerPort: 8080
               name: http
           env:
             - name: AUTH_ISSUER
-              value: http://sample-api/auth
+              value: http://crew-demo-api/auth
             - name: PROXY_REDIRECT_URL
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: PROXY_REDIRECT_URL
                   optional: true
             - name: OIDC_ISSUER
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: OIDC_ISSUER
             - name: OIDC_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: OIDC_CLIENT_ID
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: OIDC_CLIENT_SECRET
             - name: OIDC_ALLOWED_AUDIENCES
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: OIDC_ALLOWED_AUDIENCES
                   optional: true
             - name: AUTH_PRIVATE_KEY_BASE64
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: AUTH_PRIVATE_KEY_BASE64
             - name: AUTH_STATE_KEY_BASE64
               valueFrom:
                 secretKeyRef:
-                  name: sample-app-auth
+                  name: crew-demo-auth
                   key: AUTH_STATE_KEY_BASE64
             - name: PGHOST
-              value: sample-postgres-rw
+              value: crew-demo-postgres-rw
             - name: PGDATABASE
               value: app
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
-                  name: sample-postgres-app
+                  name: crew-demo-postgres-app
                   key: username
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: sample-postgres-app
+                  name: crew-demo-postgres-app
                   key: password
             - name: OTEL_SERVICE_NAME
-              value: sample-api
+              value: crew-demo-api
           readinessProbe:
             grpc:
               port: 8080

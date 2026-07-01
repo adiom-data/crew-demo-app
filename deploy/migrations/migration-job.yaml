@@ -1,13 +1,13 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: sample-app-migrate-app
+  name: crew-demo-migrate-app
 spec:
   backoffLimit: 12
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: sample-app-migrate-app
+        app.kubernetes.io/name: crew-demo-migrate-app
     spec:
       restartPolicy: OnFailure
       securityContext:
@@ -19,21 +19,21 @@ spec:
           type: RuntimeDefault
       containers:
         - name: migrate-app
-          image: ghcr.io/adiom-data/sample-app-migrate:latest
+          image: ghcr.io/adiom-data/crew-demo-app-migrate:latest
           env:
             - name: DB_HOST
-              value: sample-postgres-rw
+              value: crew-demo-postgres-rw
             - name: DB_NAME
               value: app
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: sample-postgres-app
+                  name: crew-demo-postgres-app
                   key: username
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: sample-postgres-app
+                  name: crew-demo-postgres-app
                   key: password
           resources:
             requests:

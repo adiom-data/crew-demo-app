@@ -6,7 +6,7 @@ go_library(
         "app.go",
         "sample.go",
     ],
-    importpath = "github.com/adiom-data/sample-app/internal/api",
+    importpath = "github.com/adiom-data/crew-demo-app/internal/api",
     visibility = ["//cmd/api:__pkg__"],
     deps = [
         "//gen/go/sample/v1:samplev1",

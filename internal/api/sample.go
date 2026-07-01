@@ -6,8 +6,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/adiom-data/framework/auth/tokenissuer"
-	samplev1 "github.com/adiom-data/sample-app/gen/go/sample/v1"
-	apidb "github.com/adiom-data/sample-app/internal/api/db"
+	samplev1 "github.com/adiom-data/crew-demo-app/gen/go/sample/v1"
+	apidb "github.com/adiom-data/crew-demo-app/internal/api/db"
 )
 
 type sampleService struct {

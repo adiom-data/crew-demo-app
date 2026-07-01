@@ -13,12 +13,12 @@ oci_image(
 oci_load(
     name = "load",
     image = ":image",
-    repo_tags = ["sample-app-migrate:latest"],
+    repo_tags = ["crew-demo-app-migrate:latest"],
 )
 
 oci_push(
     name = "push",
     image = ":image",
     remote_tags = ["latest"],
-    repository = "ghcr.io/adiom-data/sample-app-migrate",
+    repository = "ghcr.io/adiom-data/crew-demo-app-migrate",
 )

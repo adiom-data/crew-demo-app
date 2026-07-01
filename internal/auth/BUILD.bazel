@@ -7,7 +7,7 @@ go_library(
         "browser.go",
         "service.go",
     ],
-    importpath = "github.com/adiom-data/sample-app/internal/auth",
+    importpath = "github.com/adiom-data/crew-demo-app/internal/auth",
     visibility = ["//internal/api:__pkg__"],
     deps = [
         "//internal/auth/db",

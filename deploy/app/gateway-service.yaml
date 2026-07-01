@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: sample-gateway
+  name: crew-demo-gateway
 spec:
   selector:
-    app.kubernetes.io/name: sample-gateway
+    app.kubernetes.io/name: crew-demo-gateway
   ports:
     - name: http
       port: 80

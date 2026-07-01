@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "samplev1",
     srcs = ["sample.pb.go"],
-    importpath = "github.com/adiom-data/sample-app/gen/go/sample/v1",
+    importpath = "github.com/adiom-data/crew-demo-app/gen/go/sample/v1",
     visibility = ["//visibility:public"],
     deps = [
         "@org_golang_google_protobuf//reflect/protoreflect",
