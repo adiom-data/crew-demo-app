@@ -78,6 +78,27 @@ image_kustomization(
         ":api_image",
         ":gateway_image",
     ],
+    kustomize_dirs = ["base"],
+    overlay_path = "overlays/prod",
+    repository_prefix_override_all = "{STABLE_REFERENCE_PREFIX}",
+    source_prefix = "deploy/app",
+    stamp = True,
+)
+
+# Same base, but the preview overlay omits the host patch so previews stay
+# portable (host bound per tenant namespace). Prod pins t-crew-demo.infrapad.ai
+# via overlays/prod.
+image_kustomization(
+    name = "app_preview_deploy",
+    srcs = [":app_srcs"],
+    artifact_suffix = "crew-demo-app-deploy",
+    bundle_name = "app",
+    images = [
+        ":api_image",
+        ":gateway_image",
+    ],
+    kustomize_dirs = ["base"],
+    overlay_path = "overlays/preview",
     repository_prefix_override_all = "{STABLE_REFERENCE_PREFIX}",
     source_prefix = "deploy/app",
     stamp = True,
@@ -100,7 +121,7 @@ publish_bundle_set(
     bundles = [
         ":preview_infra_deploy",
         ":migration_deploy",
-        ":app_deploy",
+        ":app_preview_deploy",
     ],
     push_prefix = "{STABLE_REFERENCE_PREFIX}",
     stamp = True,

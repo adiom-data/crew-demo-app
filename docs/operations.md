@@ -72,7 +72,8 @@ Built and published from `deploy/BUILD.bazel`. Four bundles, applied in order:
 | infra | `//deploy:infra_deploy` | CloudNativePG `Cluster` (`crew-demo-postgres`). | long-lived; never force-apply. |
 | preview-infra | `//deploy:preview_infra_deploy` | disposable `postgres:18` Deployment (emptyDir). | preview only; swaps for `infra`. |
 | migration | `//deploy:migration_deploy` | setup Job + migration Job. | `force = True` (Job pod templates are immutable), `stamp = True`. |
-| app | `//deploy:app_deploy` | API + gateway Deployments/Services + `HTTPRoute`. | `stamp = True`; images `crew-demo-app-{api,gateway}`. |
+| app (release) | `//deploy:app_deploy` | API + gateway Deployments/Services + `HTTPRoute`, rendered through `deploy/app/overlays/prod` (pins host `t-crew-demo.infrapad.ai`). | `stamp = True`; images `crew-demo-app-{api,gateway}`. |
+| app (preview) | `//deploy:app_preview_deploy` | Same base via `deploy/app/overlays/preview` (no host patch — stays portable). | `stamp = True`; used by `publish_preview`. |
 
 Publish:
 ```sh
@@ -80,8 +81,9 @@ bazel run //deploy:publish            # release: infra + migration + app  (manif
 bazel run //deploy:publish_preview    # preview: preview-infra + migration + app
 ```
 **Order at reconcile:** setup Job (creates `app` DB + role as superuser) → migration Job (goose as
-`app`) → app workloads. Manifests intentionally omit `metadata.namespace` and `HTTPRoute.hostnames`
-so the same bundles bind to any tenant namespace/host.
+`app`) → app workloads. Base manifests intentionally omit `metadata.namespace` and
+`HTTPRoute.hostnames` so the same bundles bind to any tenant namespace/host; the `overlays/prod`
+overlay pins the release host `t-crew-demo.infrapad.ai`, while `overlays/preview` leaves it unset.
 
 Image reference stamping uses `tools/status.sh` (emits `STABLE_GIT_COMMIT`,
 `STABLE_REFERENCE_PREFIX` default `ghcr.io/adiom-data`).

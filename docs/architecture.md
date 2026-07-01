@@ -10,7 +10,7 @@ Browser ─▶ Gateway ─(verified bearer)─▶ API (+ auth, one binary) ─�
                 │                              │
                 │ serves SPA (/app/web/dist)   └─ OIDC ─▶ Google (accounts.google.com)
                 ▼
-        Gateway API ingress (HTTPRoute, hostname bound by environment)
+        Gateway API ingress (HTTPRoute; prod overlay pins t-crew-demo.infrapad.ai)
 ```
 
 - **Gateway** (`services/gateway/`) — the pinned `ghcr.io/adiom-data/components/gateway` image

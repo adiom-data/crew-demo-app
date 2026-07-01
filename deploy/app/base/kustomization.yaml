@@ -6,3 +6,8 @@ resources:
   - gateway-deployment.yaml
   - gateway-service.yaml
   - http-route.yaml
+images:
+  - name: ghcr.io/adiom-data/crew-demo-app-api
+    newTag: latest
+  - name: ghcr.io/adiom-data/crew-demo-app-gateway
+    newTag: latest

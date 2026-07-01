@@ -31,7 +31,7 @@ Vite/React SPA served in production behind a component **gateway**. It is a fork
 | `services/api/migrations/` | goose SQL migrations (`00001…`, `00002…`). |
 | `services/gateway/` | Gateway image wrapper + `gateway.json` routing/auth config. |
 | `web/` | Vite/React SPA (`src/routes/`, `src/api/`, `src/lib/`, `src/gen/`). |
-| `deploy/` | Kustomize manifests + Bazel Flux-bundle targets (`infra`, `preview-infra`, `migrations`, `app`). |
+| `deploy/` | Kustomize manifests + Bazel Flux-bundle targets (`infra`, `preview-infra`, `migrations`, `app`). The `app` bundle uses `app/base` + `app/overlays/{prod,preview}` (prod pins the host). |
 
 ## Build / test / run
 Bazel is the only build tool. Quick reference (details in [docs/operations.md](docs/operations.md)

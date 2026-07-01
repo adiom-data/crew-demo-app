@@ -87,7 +87,7 @@ Statements that MUST hold for the system to operate correctly — a fusion of pr
 - **Rationale:** A mismatch breaks routing and token validation. (This was violated after the
   `sample-app`→`crew-demo-app` rename and fixed at commit 4a51902's successor.)
 - **Source:** [architecture.md](architecture.md); [integrations.md](integrations.md).
-- **Enforcement:** `services/gateway/gateway.json` values vs `deploy/app/api-service.yaml`.
+- **Enforcement:** `services/gateway/gateway.json` values vs `deploy/app/base/api-service.yaml`.
   `<UNENFORCED>` — no automated cross-check.
 
 ## INV-11: The API re-verifies forwarded bearer tokens

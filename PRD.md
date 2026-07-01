@@ -85,10 +85,13 @@ See [docs/workflows.md](docs/workflows.md) and [docs/data-flows.md](docs/data-fl
   browser refresh tokens live only server-side in `auth_sessions`; the gateway validates tokens and
   forwards the verified bearer to the API, which independently re-verifies via issuer JWKS.
 - **Availability / graceful degradation:** API readiness MUST NOT depend on transient Postgres
-  availability; DB errors are handled per-request. User-facing Deployments run ≥2 replicas with
-  `maxUnavailable: 0`.
-- **Portability:** Kubernetes manifests omit `namespace` and `HTTPRoute.hostnames` so the same
-  bundles deploy into any tenant namespace.
+  availability; DB errors are handled per-request. This demo runs **1 replica** each for the API and
+  gateway; the framework convention for production is ≥2 replicas with `maxUnavailable: 0` /
+  `maxSurge: 1` for zero-downtime rolling updates.
+- **Portability:** Base Kubernetes manifests omit `namespace` and `HTTPRoute.hostnames` so the same
+  bundles deploy into any tenant namespace. The **prod** overlay (`deploy/app/overlays/prod`) pins
+  the release host `t-crew-demo.infrapad.ai`; the **preview** overlay stays host-less so ephemeral
+  tenant namespaces bind their own host.
 - **Observability:** OpenTelemetry traces/metrics to the namespace collector; structured JSON logs to
   stdout. Secrets and raw dependency errors MUST NOT appear in logs or client responses.
 - **Scale/performance:** `<MISSING>` — no explicit targets defined (this is a demo app).

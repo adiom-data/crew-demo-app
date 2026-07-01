@@ -9,7 +9,7 @@ This is the **single home** for environment variables and external services; oth
 | **Google / OIDC provider** | `internal/auth` | OAuth2 auth-code + PKCE; `OIDC_*` env; Google options `AccessTypeOffline` + `prompt=consent`. | `internal/auth/browser.go:42-63`, `service.go:32-46` |
 | **Postgres (release)** | API, migrate/setup Jobs | CloudNativePG `Cluster` `crew-demo-postgres`; reached at `crew-demo-postgres-rw`; creds from generated secrets. | `deploy/infra/postgres-cluster.yaml` |
 | **Postgres (preview)** | same | Plain `postgres:18` Deployment (emptyDir, `trust` auth) — disposable. | `deploy/preview-infra/postgres-deployment.yaml` |
-| **OpenTelemetry collector** | framework `httpapp` telemetry | OTLP/HTTP to the namespace `otel-collector:4318` (framework default); only `OTEL_SERVICE_NAME` is set in-cluster. | `deploy/app/api-deployment.yaml:88-89` |
+| **OpenTelemetry collector** | framework `httpapp` telemetry | OTLP/HTTP to the namespace `otel-collector:4318` (framework default); only `OTEL_SERVICE_NAME` is set in-cluster. | `deploy/app/base/api-deployment.yaml:88-89` |
 | **Gateway component** | edge | `ghcr.io/adiom-data/components/gateway` image, configured by `gateway.json`; validates tokens, serves SPA, forwards verified bearer. | `services/gateway/`, `MODULE.bazel:56-62` |
 | **Container registry (ghcr.io/adiom-data)** | build/deploy | OCI push of `crew-demo-app-{api,gateway,migrate}`; base images pulled via `oci.pull`. | `cmd/*/BUILD.bazel`, `deploy/BUILD.bazel`, `MODULE.bazel:49-78` |
 
