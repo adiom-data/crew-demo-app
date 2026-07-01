@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: crew-demo-api
 spec:
-  replicas: 2
+  replicas: 1
   minReadySeconds: 5
   strategy:
     type: RollingUpdate
