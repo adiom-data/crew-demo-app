@@ -2,7 +2,10 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "samplev1",
-    srcs = ["sample.pb.go"],
+    srcs = [
+        "partner.pb.go",
+        "sample.pb.go",
+    ],
     importpath = "github.com/adiom-data/crew-demo-app/gen/go/sample/v1",
     visibility = ["//visibility:public"],
     deps = [
@@ -10,4 +13,3 @@ go_library(
         "@org_golang_google_protobuf//runtime/protoimpl",
     ],
 )
-

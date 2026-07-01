@@ -1,8 +1,12 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//web:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//web:vitest/package_json.bzl", vitest_bin = "bin")
 
-exports_files(["package.json"], visibility = ["//visibility:public"])
+exports_files(
+    ["package.json"],
+    visibility = ["//visibility:public"],
+)
 
 filegroup(
     name = "package_json",
@@ -25,10 +29,24 @@ vite_bin.vite(
     name = "build",
     srcs = [
         "index.html",
-        "src/api/sampleClient.ts",
         "src/App.tsx",
+        "src/api/clients.ts",
+        "src/api/partnerClient.ts",
+        "src/api/sampleClient.ts",
+        "src/components/AppShell.tsx",
+        "src/components/StatusBadge.tsx",
+        "src/gen/sample/v1/partner_pb.ts",
         "src/gen/sample/v1/sample_pb.ts",
+        "src/lib/csv.ts",
+        "src/lib/format.ts",
         "src/main.tsx",
+        "src/routes/AddPartner.tsx",
+        "src/routes/BulkImport.tsx",
+        "src/routes/Dashboard.tsx",
+        "src/routes/Login.tsx",
+        "src/routes/PartnerDetail.tsx",
+        "src/routes/PublicOnboarding.tsx",
+        "src/session.ts",
         "src/styles.css",
         "tsconfig.json",
         ":node_modules/@adiom-data/framework-web",
@@ -39,6 +57,7 @@ vite_bin.vite(
         ":node_modules/@types/react-dom",
         ":node_modules/react",
         ":node_modules/react-dom",
+        ":node_modules/react-router-dom",
     ],
     chdir = package_name(),
     data = [":vite_config"],
@@ -48,5 +67,36 @@ vite_bin.vite(
         "$$RUNFILES_DIR/$(rlocationpath :vite_config)",
     ],
     out_dirs = ["dist"],
+    visibility = ["//visibility:public"],
+)
+
+vitest_bin.vitest_test(
+    name = "test",
+    args = ["run"],
+    chdir = package_name(),
+    data = glob([
+        "src/**/*.ts",
+        "src/**/*.tsx",
+    ]) + [
+        "tsconfig.json",
+        "vitest.config.ts",
+        "vitest.setup.ts",
+        ":node_modules/@adiom-data/framework-web",
+        ":node_modules/@bufbuild/protobuf",
+        ":node_modules/@connectrpc/connect",
+        ":node_modules/@connectrpc/connect-web",
+        ":node_modules/@testing-library/jest-dom",
+        ":node_modules/@testing-library/react",
+        ":node_modules/@testing-library/user-event",
+        ":node_modules/@types/react",
+        ":node_modules/@types/react-dom",
+        ":node_modules/@vitejs/plugin-react",
+        ":node_modules/jsdom",
+        ":node_modules/react",
+        ":node_modules/react-dom",
+        ":node_modules/react-router-dom",
+        ":node_modules/vite",
+        ":node_modules/vitest",
+    ],
     visibility = ["//visibility:public"],
 )

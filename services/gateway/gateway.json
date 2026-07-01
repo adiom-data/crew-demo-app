@@ -13,6 +13,13 @@
           "path": "/sample.v1.SampleService/"
         },
         {
+          "path": "/sample.v1.PartnerService/"
+        },
+        {
+          "path": "/sample.v1.OnboardingService/",
+          "public": true
+        },
+        {
           "path": "/adiom.auth.v1.AuthService/",
           "public": true
         },

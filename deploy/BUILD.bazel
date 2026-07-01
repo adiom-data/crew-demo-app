@@ -43,34 +43,35 @@ deploy_image(
 
 image_kustomization(
     name = "infra_deploy",
+    srcs = [":infra_srcs"],
     artifact_suffix = "crew-demo-app-infra-deploy",
     bundle_name = "infra",
     source_prefix = "deploy/infra",
-    srcs = [":infra_srcs"],
 )
 
 image_kustomization(
     name = "preview_infra_deploy",
+    srcs = [":preview_infra_srcs"],
     artifact_suffix = "crew-demo-app-preview-infra-deploy",
     bundle_name = "infra",
     source_prefix = "deploy/preview-infra",
-    srcs = [":preview_infra_srcs"],
 )
 
 image_kustomization(
     name = "migration_deploy",
+    srcs = [":migration_srcs"],
     artifact_suffix = "crew-demo-app-migration-deploy",
     bundle_name = "migration",
     force = True,
     images = [":migrate_image"],
     repository_prefix_override_all = "{STABLE_REFERENCE_PREFIX}",
     source_prefix = "deploy/migrations",
-    srcs = [":migration_srcs"],
     stamp = True,
 )
 
 image_kustomization(
     name = "app_deploy",
+    srcs = [":app_srcs"],
     artifact_suffix = "crew-demo-app-deploy",
     bundle_name = "app",
     images = [
@@ -79,7 +80,6 @@ image_kustomization(
     ],
     repository_prefix_override_all = "{STABLE_REFERENCE_PREFIX}",
     source_prefix = "deploy/app",
-    srcs = [":app_srcs"],
     stamp = True,
 )
 
@@ -90,8 +90,8 @@ publish_bundle_set(
         ":migration_deploy",
         ":app_deploy",
     ],
-    push_prefix = "{STABLE_REFERENCE_PREFIX}",
     manifest_tag = "release",
+    push_prefix = "{STABLE_REFERENCE_PREFIX}",
     stamp = True,
 )
 

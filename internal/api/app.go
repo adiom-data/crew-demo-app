@@ -69,6 +69,19 @@ func Run(cfg Config) error {
 			sampleService{db: db},
 			httpapp.WithInterceptors(tokenissuer.ConnectAuth(authenticator)),
 		),
+		// PartnerService is admin-only: same bearer auth as SampleService.
+		httpapp.ConnectHandler[samplev1connect.PartnerServiceHandler](
+			samplev1connect.PartnerServiceName,
+			samplev1connect.NewPartnerServiceHandler,
+			partnerService{db: db},
+			httpapp.WithInterceptors(tokenissuer.ConnectAuth(authenticator)),
+		),
+		// OnboardingService is public: no auth interceptor so partners can self-submit.
+		httpapp.ConnectHandler[samplev1connect.OnboardingServiceHandler](
+			samplev1connect.OnboardingServiceName,
+			samplev1connect.NewOnboardingServiceHandler,
+			onboardingService{db: db},
+		),
 	}
 	services = append(services, authService.ConnectServices...)
 

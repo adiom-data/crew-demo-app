@@ -5,9 +5,7 @@ load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
 go_library(
     name = "api_lib",
-    srcs = [
-        "main.go",
-    ],
+    srcs = ["main.go"],
     importpath = "github.com/adiom-data/crew-demo-app/cmd/api",
     visibility = ["//visibility:private"],
     deps = [

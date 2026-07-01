@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package sample.v1;
+
+option go_package = "github.com/adiom-data/crew-demo-app/gen/go/sample/v1;samplev1";
+
+// Tier is the partner's plan level.
+enum Tier {
+  TIER_UNSPECIFIED = 0;
+  TIER_STARTER = 1;
+  TIER_PRO = 2;
+  TIER_ENTERPRISE = 3;
+}
+
+// Status is the partner's lifecycle state.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_ACTIVE = 2;
+  STATUS_CHURNED = 3;
+}
+
+// BillingStatus is the partner's billing state.
+enum BillingStatus {
+  BILLING_STATUS_UNSPECIFIED = 0;
+  BILLING_STATUS_CURRENT = 1;
+  BILLING_STATUS_PAST_DUE = 2;
+  BILLING_STATUS_TRIALING = 3;
+}
+
+message Partner {
+  string id = 1;
+  string name = 2;
+  string contact_email = 3;
+  string company = 4;
+  string region = 5;
+  Tier tier = 6;
+  Status status = 7;
+  BillingStatus billing_status = 8;
+  string notes = 9;
+  // created_at is an RFC 3339 timestamp string.
+  string created_at = 10;
+}
+
+message Activity {
+  string id = 1;
+  string partner_id = 2;
+  string type = 3;
+  string message = 4;
+  // created_at is an RFC 3339 timestamp string.
+  string created_at = 5;
+}
+
+// PartnerService is the authenticated admin-facing management API.
+service PartnerService {
+  rpc ListPartners(ListPartnersRequest) returns (ListPartnersResponse);
+  rpc GetPartner(GetPartnerRequest) returns (GetPartnerResponse);
+  rpc CreatePartner(CreatePartnerRequest) returns (CreatePartnerResponse);
+  rpc UpdatePartnerStatus(UpdatePartnerStatusRequest) returns (UpdatePartnerStatusResponse);
+  rpc BulkImportPartners(BulkImportPartnersRequest) returns (BulkImportPartnersResponse);
+}
+
+message ListPartnersRequest {}
+
+message ListPartnersResponse {
+  repeated Partner partners = 1;
+  int32 total = 2;
+  int32 active = 3;
+  int32 pending = 4;
+}
+
+message GetPartnerRequest {
+  string id = 1;
+}
+
+message GetPartnerResponse {
+  Partner partner = 1;
+  repeated Activity activities = 2;
+}
+
+message CreatePartnerRequest {
+  string name = 1;
+  string contact_email = 2;
+  string company = 3;
+  string region = 4;
+  Tier tier = 5;
+  string notes = 6;
+}
+
+message CreatePartnerResponse {
+  Partner partner = 1;
+}
+
+message UpdatePartnerStatusRequest {
+  string id = 1;
+  Status status = 2;
+}
+
+message UpdatePartnerStatusResponse {
+  Partner partner = 1;
+}
+
+// PartnerInput is one row of a bulk import request.
+message PartnerInput {
+  string name = 1;
+  string contact_email = 2;
+  string company = 3;
+  string region = 4;
+  Tier tier = 5;
+}
+
+message RowError {
+  // row is the 1-based index of the offending input row.
+  int32 row = 1;
+  string message = 2;
+}
+
+message BulkImportPartnersRequest {
+  repeated PartnerInput rows = 1;
+}
+
+message BulkImportPartnersResponse {
+  int32 imported = 1;
+  repeated RowError errors = 2;
+}
+
+// OnboardingService is the public, unauthenticated partner self-serve API.
+service OnboardingService {
+  rpc SubmitOnboarding(SubmitOnboardingRequest) returns (SubmitOnboardingResponse);
+}
+
+message SubmitOnboardingRequest {
+  string name = 1;
+  string contact_email = 2;
+  string company = 3;
+  string region = 4;
+}
+
+message SubmitOnboardingResponse {
+  string partner_id = 1;
+}
