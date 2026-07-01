@@ -1,12 +1,12 @@
 {
   "addr": ":8080",
   "auth": {
-    "issuer": "http://sample-api/auth"
+    "issuer": "http://crew-demo-api/auth"
   },
   "backends": [
     {
-      "name": "sample-api",
-      "url": "http://sample-api",
+      "name": "crew-demo-api",
+      "url": "http://crew-demo-api",
       "auth_forwarding": "verified_bearer",
       "routes": [
         {
