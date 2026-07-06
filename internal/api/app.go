@@ -4,17 +4,25 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/adiom-data/framework/auth/tokenissuer"
-	"github.com/adiom-data/framework/httpapp"
 	samplev1 "github.com/adiom-data/crew-demo-app/gen/go/sample/v1"
 	"github.com/adiom-data/crew-demo-app/gen/go/sample/v1/samplev1connect"
 	apidb "github.com/adiom-data/crew-demo-app/internal/api/db"
 	appauth "github.com/adiom-data/crew-demo-app/internal/auth"
+	"github.com/adiom-data/framework/auth/tokenissuer"
+	"github.com/adiom-data/framework/httpapp"
 )
 
 type Config struct {
-	DB   DBConfig
-	Auth AuthConfig
+	DB       DBConfig
+	Auth     AuthConfig
+	AgentMCP AgentMCPConfig
+}
+
+// AgentMCPConfig configures the unauthenticated /mcp endpoint exposed to the AdiomBot
+// agent. SelfBaseURL is the in-process address grpcmcp reflects against and proxies to
+// (defaults to http://127.0.0.1:8080, the framework's listen address).
+type AgentMCPConfig struct {
+	SelfBaseURL string
 }
 
 type DBConfig = apidb.Config
@@ -82,12 +90,26 @@ func Run(cfg Config) error {
 			samplev1connect.NewOnboardingServiceHandler,
 			onboardingService{db: db},
 		),
+		// AgentQueryService is the read-only surface behind the /mcp endpoint. It is
+		// unauthenticated by design (see AgentMCPConfig); keep it side-effect-free.
+		httpapp.ConnectHandler[samplev1connect.AgentQueryServiceHandler](
+			samplev1connect.AgentQueryServiceName,
+			samplev1connect.NewAgentQueryServiceHandler,
+			agentQueryService{db: db},
+		),
 	}
 	services = append(services, authService.ConnectServices...)
 
+	selfBaseURL := cfg.AgentMCP.SelfBaseURL
+	if selfBaseURL == "" {
+		selfBaseURL = "http://127.0.0.1:8080"
+	}
+	routes := append([]httpapp.Route{}, authService.Routes...)
+	routes = append(routes, httpapp.Handle("/mcp", newAgentMCPHandler(selfBaseURL)))
+
 	return runtime.NewService(
 		httpapp.WithServices(services...),
-		httpapp.WithServiceRoutes(authService.Routes...),
+		httpapp.WithServiceRoutes(routes...),
 		httpapp.WithReflection(),
 	).Run(ctx)
 }

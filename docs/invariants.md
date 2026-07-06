@@ -39,6 +39,17 @@ Statements that MUST hold for the system to operate correctly — a fusion of pr
 - **Enforcement:** registration `internal/api/app.go:65-85`; gateway `services/gateway/gateway.json`.
   `<PARTIAL>` — the two must be kept in sync by hand; no automated check.
 
+## INV-4b: AgentQueryService and /mcp are read-only and unauthenticated
+- **Statement:** `sample.v1.AgentQueryService` (and everything reachable via the `/mcp` grpcmcp
+  endpoint) MUST contain only side-effect-free reads. It is served **unauthenticated** — both
+  registered without `tokenissuer.ConnectAuth` and marked `"public": true` in `gateway.json` — so
+  any method added here becomes an unauthenticated public read.
+- **Rationale:** The AdiomBot worker discovers these as agent tools with no credentials; a mutating
+  method would be a public, unauthenticated write.
+- **Enforcement:** `internal/api/agentquery.go` (only reads), `internal/api/agentmcp.go`
+  (`Services` filter pins the exposed service), gateway `/mcp` route. `<PARTIAL>` — no automated
+  check; keep the service read-only by review.
+
 ## INV-5: Partner creation and status changes are logged
 - **Statement:** Creating a partner, submitting onboarding, and changing status MUST append an
   `activities` row.

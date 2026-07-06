@@ -20,6 +20,10 @@
           "public": true
         },
         {
+          "path": "/mcp",
+          "public": true
+        },
+        {
           "path": "/adiom.auth.v1.AuthService/",
           "public": true
         },
