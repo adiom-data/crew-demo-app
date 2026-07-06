@@ -40,6 +40,8 @@ type environment struct {
 	OIDCClientID         string   `env:"OIDC_CLIENT_ID,required"`
 	OIDCClientSecret     string   `env:"OIDC_CLIENT_SECRET,required"`
 	OIDCAllowedAudiences []string `env:"OIDC_ALLOWED_AUDIENCES" envSeparator:","`
+
+	AgentMCPSelfBaseURL string `env:"AGENT_MCP_SELF_BASE_URL"`
 }
 
 func configFromEnv() (api.Config, error) {
@@ -71,6 +73,9 @@ func configFromEnv() (api.Config, error) {
 				AllowedAudiences: append([]string{e.OIDCClientID}, e.OIDCAllowedAudiences...),
 			},
 			InsecureCookies: e.AuthInsecureCookies,
+		},
+		AgentMCP: api.AgentMCPConfig{
+			SelfBaseURL: e.AgentMCPSelfBaseURL,
 		},
 	}, nil
 }

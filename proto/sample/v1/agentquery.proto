@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package sample.v1;
+
+option go_package = "github.com/adiom-data/crew-demo-app/gen/go/sample/v1;samplev1";
+
+import "sample/v1/partner.proto";
+
+// AgentQueryService is the read-only query surface exposed (unauthenticated) to the
+// AdiomBot agent via the /mcp endpoint. It must contain only side-effect-free methods.
+// Request/response types are dedicated (buf STANDARD requires per-RPC uniqueness) but
+// reuse the shared Partner message.
+service AgentQueryService {
+  // ListPartners returns all partners with status counts.
+  rpc ListPartners(AgentQueryServiceListPartnersRequest) returns (AgentQueryServiceListPartnersResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message AgentQueryServiceListPartnersRequest {}
+
+message AgentQueryServiceListPartnersResponse {
+  repeated Partner partners = 1;
+  int32 total = 2;
+  int32 active = 3;
+  int32 pending = 4;
+}

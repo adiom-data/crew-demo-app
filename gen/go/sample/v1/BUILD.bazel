@@ -3,6 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "samplev1",
     srcs = [
+        "agentquery.pb.go",
         "partner.pb.go",
         "sample.pb.go",
     ],

@@ -84,6 +84,21 @@ Dashboard  ─▶ PartnerService.ListPartners ─▶ ListPartners + CountByStatu
   `{row, message}` entries in the response and the row is skipped; valid rows are inserted as
   `active`. The SPA renders `imported` + the per-row error report.
 
+## Flow 5 — AdiomBot agent MCP query
+```
+AdiomBot worker ─▶ POST /mcp (streamable HTTP, no auth) ─▶ grpcmcp handler
+                                                        └▶ (self, reflection) AgentQueryService.ListPartners
+                                                     ▶ returns partners + counts as an MCP tool result
+```
+1. The **AdiomBot worker** (integrations repo), when this repo's stable environment has Agent MCP
+   enabled with the app's public URL, connects to `https://<host>/mcp` and lists tools.
+2. **`/mcp`** is served by `agentMCPHandler` (`internal/api/agentmcp.go`), which lazily builds a
+   grpcmcp server on first request: it self-dials the in-process Connect API via gRPC reflection and
+   exposes only `sample.v1.AgentQueryService` as MCP tools.
+3. A tool call proxies to **`AgentQueryService.ListPartners`** (`internal/api/agentquery.go`), which
+   reads via the same DB helpers as PartnerService and returns partner data. Unauthenticated and
+   read-only by design (see [invariants.md](invariants.md) INV-4b).
+
 ## Seeding (out-of-band)
 `cmd/seed/main.go` opens the DB directly (env `PG*`), and if `partners` is empty inserts ~30 partners
 + activities via the same `apidb` helpers (idempotent: skips when rows exist). Not part of any RPC

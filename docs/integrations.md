@@ -49,6 +49,17 @@ comes from in the release manifests.
 | `OIDC_CLIENT_SECRET` | — | **yes** | secret `crew-demo-auth`. |
 | `OIDC_ALLOWED_AUDIENCES` | — | no | secret `crew-demo-auth` (comma-separated; the client id is always allowed). |
 
+### API — agent MCP (`/mcp`)
+The **AdiomBot** worker consumes `sample.v1.AgentQueryService` through a public, unauthenticated
+[grpcmcp](https://github.com/adiom-data/grpcmcp) endpoint at `POST /mcp`. The handler
+(`internal/api/agentmcp.go`) builds itself lazily, discovering the service via in-process gRPC
+reflection against the self address. Enable it per environment from the AdiomBot management UI by
+pointing it at this app's public URL (e.g. `https://t-crew-demo.infrapad.ai/mcp`).
+
+| Var | Default | Required | Source / meaning |
+|-----|---------|----------|------------------|
+| `AGENT_MCP_SELF_BASE_URL` | `http://127.0.0.1:8080` | no | In-process address grpcmcp reflects against + proxies to. Override only if the listen port differs from 8080. |
+
 ### Framework (`httpapp` / telemetry)
 | Var | Default | Notes |
 |-----|---------|-------|
