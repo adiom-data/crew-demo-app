@@ -65,23 +65,28 @@ The public `/onboard` form works without login; the dashboard requires Google si
 - Locally, apply with the `goose` CLI (above) or run the migrate image against your DB.
 
 ## Deploy (FluxCD OCI bundles)
-Built and published from `deploy/BUILD.bazel`. Four bundles, applied in order:
+Built and published from `deploy/BUILD.bazel`. Bundles, applied in order:
 
 | Bundle | Target | Contents | Notes |
 |--------|--------|----------|-------|
 | infra | `//deploy:infra_deploy` | CloudNativePG `Cluster` (`crew-demo-postgres`). | long-lived; never force-apply. |
 | preview-infra | `//deploy:preview_infra_deploy` | disposable `postgres:18` Deployment (emptyDir). | preview only; swaps for `infra`. |
 | migration | `//deploy:migration_deploy` | setup Job + migration Job. | `force = True` (Job pod templates are immutable), `stamp = True`. |
+| seed | `//deploy:seed_deploy` | demo-data seed Job (`crew-demo-seed-app`) running the `crew-demo-app-seed` image. | **preview only** — in `publish_preview`, not the release set; `force = True`, `stamp = True`. |
 | app (release) | `//deploy:app_deploy` | API + gateway Deployments/Services + `HTTPRoute`, rendered through `deploy/app/overlays/prod` (pins host `t-crew-demo.infrapad.ai`). | `stamp = True`; images `crew-demo-app-{api,gateway}`. |
 | app (preview) | `//deploy:app_preview_deploy` | Same base via `deploy/app/overlays/preview` (no host patch — stays portable). | `stamp = True`; used by `publish_preview`. |
 
 Publish:
 ```sh
 bazel run //deploy:publish            # release: infra + migration + app  (manifest_tag "release")
-bazel run //deploy:publish_preview    # preview: preview-infra + migration + app
+bazel run //deploy:publish_preview    # preview: preview-infra + migration + seed + app
 ```
 **Order at reconcile:** setup Job (creates `app` DB + role as superuser) → migration Job (goose as
-`app`) → app workloads. Base manifests intentionally omit `metadata.namespace` and
+`app`) → seed Job (preview only) → app workloads. The seed Job has no wait loop of its own; it exits
+non-zero until Postgres is up *and* the `partners` table exists, relying on `restartPolicy: OnFailure`
++ `backoffLimit: 20` to retry until it succeeds. The seeder is idempotent (skips if any partners
+already exist), so retries and re-reconciles are safe. Base manifests intentionally omit
+`metadata.namespace` and
 `HTTPRoute.hostnames` so the same bundles bind to any tenant namespace/host; the `overlays/prod`
 overlay pins the release host `t-crew-demo.infrapad.ai`, while `overlays/preview` leaves it unset.
 

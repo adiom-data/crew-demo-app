@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: crew-demo-seed-app
+spec:
+  # Preview only: seeds demo partners once the DB is up and migrations have
+  # created the schema. The seeder has no wait loop of its own — it exits
+  # non-zero until Postgres is reachable AND the partners table exists, so we
+  # rely on OnFailure + a generous backoffLimit to retry until it succeeds.
+  # The seeder is idempotent (skips if any partners already exist), so retries
+  # and re-reconciles are safe. backoffLimit is higher than the migration Job's
+  # (12) because seed sits one step further down the chain.
+  backoffLimit: 20
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: crew-demo-seed-app
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: seed-app
+          image: ghcr.io/adiom-data/crew-demo-app-seed:latest
+          env:
+            - name: PGHOST
+              value: crew-demo-postgres-rw
+            - name: PGDATABASE
+              value: app
+            - name: PGSSLMODE
+              value: disable
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: crew-demo-postgres-app
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crew-demo-postgres-app
+                  key: password
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true

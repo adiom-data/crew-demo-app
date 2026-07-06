@@ -87,4 +87,7 @@ Dashboard  ─▶ PartnerService.ListPartners ─▶ ListPartners + CountByStatu
 ## Seeding (out-of-band)
 `cmd/seed/main.go` opens the DB directly (env `PG*`), and if `partners` is empty inserts ~30 partners
 + activities via the same `apidb` helpers (idempotent: skips when rows exist). Not part of any RPC
-path; run via `bazel run //cmd/seed`.
+path; run via `bazel run //cmd/seed` locally. In **preview** environments it also runs automatically:
+the `seed` bundle ships a `crew-demo-seed-app` Job (image `crew-demo-app-seed`) that runs after
+migrations — see [operations.md](operations.md#deploy-fluxcd-oci-bundles). Release/prod is never
+auto-seeded.

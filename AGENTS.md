@@ -21,7 +21,7 @@ Vite/React SPA served in production behind a component **gateway**. It is a fork
 |------|-----------------|
 | `cmd/api/` | API/auth server entrypoint; owns env parsing (`main.go`). |
 | `cmd/migrate/` | Builds the goose migration OCI image (no Go `main`; layers SQL). |
-| `cmd/seed/` | Idempotent demo-data seeder (`go run ./cmd/seed`). |
+| `cmd/seed/` | Idempotent demo-data seeder (`go run ./cmd/seed`); also built as an OCI image and run as a preview-only Job. |
 | `internal/api/` | Connect service impls: `sample.go` (session), `partner.go` (PartnerService + OnboardingService), `app.go` (composition/wiring). |
 | `internal/api/db/` | API-owned SQL helpers (`db.go`, `partner.go`). Proto-free. |
 | `internal/auth/` | BFF browser auth, token exchange, token issuer, user authorization. |
@@ -31,7 +31,7 @@ Vite/React SPA served in production behind a component **gateway**. It is a fork
 | `services/api/migrations/` | goose SQL migrations (`00001…`, `00002…`). |
 | `services/gateway/` | Gateway image wrapper + `gateway.json` routing/auth config. |
 | `web/` | Vite/React SPA (`src/routes/`, `src/api/`, `src/lib/`, `src/gen/`). |
-| `deploy/` | Kustomize manifests + Bazel Flux-bundle targets (`infra`, `preview-infra`, `migrations`, `app`). The `app` bundle uses `app/base` + `app/overlays/{prod,preview}` (prod pins the host). |
+| `deploy/` | Kustomize manifests + Bazel Flux-bundle targets (`infra`, `preview-infra`, `migrations`, `seed`, `app`). The `app` bundle uses `app/base` + `app/overlays/{prod,preview}` (prod pins the host); the `seed` bundle is preview-only. |
 
 ## Build / test / run
 Bazel is the only build tool. Quick reference (details in [docs/operations.md](docs/operations.md)

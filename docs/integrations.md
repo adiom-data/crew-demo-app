@@ -64,6 +64,11 @@ comes from in the release manifests.
 `DB_HOST` (`crew-demo-postgres-rw`), `DB_NAME` (`app`), `DB_USER`/`DB_PASSWORD` (secret
 `crew-demo-postgres-app`).
 
+### Seed Job (`deploy/seed/seed-job.yaml`, preview only)
+`PGHOST` (`crew-demo-postgres-rw`), `PGDATABASE` (`app`), `PGSSLMODE` (`disable`), `PGUSER`/`PGPASSWORD`
+(secret `crew-demo-postgres-app`). Same `PG*` scheme as `cmd/seed`; runs the `crew-demo-app-seed` image
+after migrations to insert demo partners. Preview only — not in the release deploy.
+
 ### Setup Job (`deploy/migrations/setup-job.yaml`)
 `PGHOST` (`crew-demo-postgres-rw`), `PGDATABASE` (`postgres`), `PGUSER`/`PGPASSWORD` (secret
 `crew-demo-postgres-superuser`), `APP_DATABASE` (`app`), `APP_DATABASE_OWNER` (secret

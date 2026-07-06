@@ -20,6 +20,11 @@ filegroup(
     srcs = glob(["migrations/**"]),
 )
 
+filegroup(
+    name = "seed_srcs",
+    srcs = glob(["seed/**"]),
+)
+
 deploy_image(
     name = "api_image",
     image = "//cmd/api:image",
@@ -39,6 +44,13 @@ deploy_image(
     image = "//cmd/migrate:image",
     repository_suffix = "crew-demo-app-migrate",
     yaml_ref = "ghcr.io/adiom-data/crew-demo-app-migrate",
+)
+
+deploy_image(
+    name = "seed_image",
+    image = "//cmd/seed:image",
+    repository_suffix = "crew-demo-app-seed",
+    yaml_ref = "ghcr.io/adiom-data/crew-demo-app-seed",
 )
 
 image_kustomization(
@@ -66,6 +78,20 @@ image_kustomization(
     images = [":migrate_image"],
     repository_prefix_override_all = "{STABLE_REFERENCE_PREFIX}",
     source_prefix = "deploy/migrations",
+    stamp = True,
+)
+
+# Preview-only demo-data seeder. Wired into publish_preview after the migration
+# bundle; not part of the release publish set (prod is never auto-seeded).
+image_kustomization(
+    name = "seed_deploy",
+    srcs = [":seed_srcs"],
+    artifact_suffix = "crew-demo-app-seed-deploy",
+    bundle_name = "seed",
+    force = True,
+    images = [":seed_image"],
+    repository_prefix_override_all = "{STABLE_REFERENCE_PREFIX}",
+    source_prefix = "deploy/seed",
     stamp = True,
 )
 
@@ -121,6 +147,7 @@ publish_bundle_set(
     bundles = [
         ":preview_infra_deploy",
         ":migration_deploy",
+        ":seed_deploy",
         ":app_preview_deploy",
     ],
     push_prefix = "{STABLE_REFERENCE_PREFIX}",
