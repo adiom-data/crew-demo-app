@@ -21,7 +21,9 @@ go_library(
         "@com_github_adiom_data_framework//httpapp",
         "@com_github_adiom_data_grpcmcp//grpcmcp",
         "@com_github_mark3labs_mcp_go//server",
+        "@org_golang_google_protobuf//reflect/protodesc",
         "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//types/descriptorpb",
     ],
 )
 
@@ -37,7 +39,6 @@ go_test(
         "//gen/go/sample/v1/samplev1connect",
         "//internal/api/db",
         "@com_connectrpc_connect//:connect",
-        "@com_connectrpc_grpcreflect//:grpcreflect",
         "@com_github_mark3labs_mcp_go//client",
         "@com_github_mark3labs_mcp_go//client/transport",
         "@com_github_mark3labs_mcp_go//mcp",

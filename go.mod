@@ -4,7 +4,6 @@ go 1.25.7
 
 require (
 	connectrpc.com/connect v1.19.2
-	connectrpc.com/grpcreflect v1.3.0
 	github.com/adiom-data/framework v0.0.0-20260626223030-db6f4346cc35
 	github.com/adiom-data/grpcmcp v0.0.0-20260602045425-7e3eda223d8e
 	github.com/caarlos0/env/v11 v11.4.1
@@ -20,6 +19,7 @@ require (
 	buf.build/go/protovalidate v1.2.0 // indirect
 	cel.dev/expr v0.25.1 // indirect
 	connectrpc.com/grpchealth v1.4.0 // indirect
+	connectrpc.com/grpcreflect v1.3.0 // indirect
 	connectrpc.com/otelconnect v0.9.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
