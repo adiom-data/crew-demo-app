@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/grpcreflect"
 	samplev1 "github.com/adiom-data/crew-demo-app/gen/go/sample/v1"
 	"github.com/adiom-data/crew-demo-app/gen/go/sample/v1/samplev1connect"
 	mcpclient "github.com/mark3labs/mcp-go/client"
@@ -30,36 +29,38 @@ func TestAgentQueryServiceListPartnersDBUnavailable(t *testing.T) {
 	}
 }
 
-// TestAgentMCPHandlerUnavailableWhenBackendDown verifies the lazy handler degrades to
-// 503 (and does not panic) when it cannot reach the backend to load descriptors, and
-// that it retries on the next request rather than caching the failure.
-func TestAgentMCPHandlerUnavailableWhenBackendDown(t *testing.T) {
-	// 127.0.0.1:1 is unreachable, so reflection load fails.
-	h := newAgentMCPHandler("http://127.0.0.1:1")
+// TestAgentMCPDescriptors verifies the compiled-in descriptor set is complete and
+// dependency-ordered, and that grpcmcp accepts it and exposes exactly the read-only tool.
+func TestAgentMCPDescriptors(t *testing.T) {
+	fds := agentMCPDescriptors()
 
-	for i := 0; i < 2; i++ {
-		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/mcp", nil)
-		h.ServeHTTP(rec, req)
-		if rec.Code != http.StatusServiceUnavailable {
-			t.Fatalf("request %d: expected 503, got %d", i, rec.Code)
-		}
+	idx := map[string]int{}
+	for i, f := range fds.GetFile() {
+		idx[f.GetName()] = i
 	}
-	if h.handler != nil {
-		t.Fatal("failed init must not be cached; expected retry on next request")
+	if _, ok := idx["sample/v1/agentquery.proto"]; !ok {
+		t.Fatalf("descriptor set missing agentquery.proto, got %v", idx)
+	}
+	if _, ok := idx["sample/v1/partner.proto"]; !ok {
+		t.Fatalf("descriptor set missing the imported partner.proto, got %v", idx)
+	}
+	// The importer must come after its dependency so protodesc.NewFile resolves.
+	if idx["sample/v1/partner.proto"] > idx["sample/v1/agentquery.proto"] {
+		t.Fatal("partner.proto must precede agentquery.proto in the set")
+	}
+
+	h := newAgentMCPHandler("http://127.0.0.1:8080")
+	if _, err := h.ensure(); err != nil {
+		t.Fatalf("ensure with compiled-in descriptors: %v", err)
 	}
 }
 
-// TestAgentMCPRoundtrip stands up the real AgentQueryService + gRPC reflection over an
-// h2c backend (as the framework serves it), points the lazy /mcp handler at it, and
-// drives it with an MCP client — proving reflection discovery + tool proxying end to end.
+// TestAgentMCPRoundtrip stands up the real AgentQueryService over an h2c backend (as the
+// framework serves it, without reflection), points the /mcp handler at it, and drives it
+// with an MCP client — proving descriptor build + tool proxying end to end.
 func TestAgentMCPRoundtrip(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.Handle(samplev1connect.NewAgentQueryServiceHandler(agentQueryService{db: nil}))
-	reflector := grpcreflect.NewStaticReflector(samplev1connect.AgentQueryServiceName)
-	mux.Handle(grpcreflect.NewHandlerV1(reflector))
-	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
-
 	backend := httptest.NewServer(h2c.NewHandler(mux, &http2.Server{}))
 	t.Cleanup(backend.Close)
 

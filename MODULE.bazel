@@ -89,7 +89,6 @@ go_deps.gazelle_override(
 use_repo(
     go_deps,
     "com_connectrpc_connect",
-    "com_connectrpc_grpcreflect",
     "com_github_adiom_data_framework",
     "com_github_adiom_data_grpcmcp",
     "com_github_caarlos0_env_v11",
