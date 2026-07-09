@@ -22,7 +22,7 @@ Vite/React SPA served in production behind a component **gateway**. It is a fork
 | `cmd/api/` | API/auth server entrypoint; owns env parsing (`main.go`). |
 | `cmd/migrate/` | Builds the goose migration OCI image (no Go `main`; layers SQL). |
 | `cmd/seed/` | Idempotent demo-data seeder (`go run ./cmd/seed`); also built as an OCI image and run as a preview-only Job. |
-| `internal/api/` | Connect service impls: `sample.go` (session), `partner.go` (PartnerService + OnboardingService), `app.go` (composition/wiring). |
+| `internal/api/` | Connect service impls: `sample.go` (session), `partner.go` (PartnerService + OnboardingService), `billing.go` (BillingService + the `/stripe/webhook` route), `app.go` (composition/wiring). |
 | `internal/api/db/` | API-owned SQL helpers (`db.go`, `partner.go`). Proto-free. |
 | `internal/auth/` | BFF browser auth, token exchange, token issuer, user authorization. |
 | `internal/auth/db/` | Auth-owned SQL helpers (`users.go`). |
@@ -58,9 +58,16 @@ Non-obvious conventions that will bite you otherwise:
   registered *without* `tokenissuer.ConnectAuth(...)` in `internal/api/app.go` **and** marked
   `"public": true` for its path prefix in `services/gateway/gateway.json`. A single method cannot be
   public on an otherwise-protected service — that is why `OnboardingService` is its own service.
-- **Enum-like columns are stored as lowercase text** (`tier`/`status`/`billing_status`); the Go
-  service layer maps text ↔ proto enums (`internal/api/partner.go`). The DB layer
-  (`internal/api/db/`) stays proto-free.
+- **Enum-like columns are stored as lowercase text** (`tier`/`status`/`billing_status`/
+  `subscription_plan`/`subscription_status`); the Go service layer maps text ↔ proto enums
+  (`internal/api/partner.go`). The DB layer (`internal/api/db/`) stays proto-free. An empty
+  subscription column means "never subscribed" and maps to `*_UNSPECIFIED`.
+- **Stripe billing is optional and webhook-driven.** `STRIPE_*` come from the separate
+  `crew-demo-stripe` secret and are never `required`; unset ⇒ billing returns `CodeUnavailable`.
+  `POST /stripe/webhook` is public and authenticated only by its HMAC signature over the **raw** body —
+  verify before decoding, never re-marshal, and keep handling idempotent (INV-4c/INV-4d). Webhook
+  verification must pass `IgnoreAPIVersionMismatch: true`, or every event from a Stripe account on an
+  older API release train is rejected.
 - **Graceful degradation:** API readiness must not depend on Postgres; handlers tolerate `db == nil`
   and return `CodeUnavailable`. Don't add readiness checks on transient DB availability.
 - **Identity key:** an admin user is `app_users.id` (UUID), resolved from the OIDC

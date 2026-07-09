@@ -190,6 +190,16 @@ dd {
   white-space: pre-wrap;
 }
 
+.notice {
+  background: #eef7f3;
+  border: 1px solid #b7d9cc;
+  border-radius: 8px;
+  color: #1d5f4c;
+  cursor: pointer;
+  margin: 0;
+  padding: 14px 16px;
+}
+
 /* ---------- app shell + nav ---------- */
 .app {
   min-height: 100vh;

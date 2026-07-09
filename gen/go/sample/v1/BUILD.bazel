@@ -4,6 +4,7 @@ go_library(
     name = "samplev1",
     srcs = [
         "agentquery.pb.go",
+        "billing.pb.go",
         "partner.pb.go",
         "sample.pb.go",
     ],

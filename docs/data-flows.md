@@ -99,6 +99,31 @@ AdiomBot worker ─▶ POST /mcp (streamable HTTP, no auth) ─▶ grpcmcp handl
    reads via the same DB helpers as PartnerService and returns partner data. Unauthenticated and
    read-only by design (see [invariants.md](invariants.md) INV-4b).
 
+## Flow 6 — Stripe subscription checkout
+1. An admin opens partner detail and clicks **Subscribe monthly/annually**
+   (`web/src/routes/PartnerDetail.tsx`).
+2. The SPA calls **`BillingService.CreateCheckoutSession`** (authenticated, via `billingClient`).
+   `internal/api/billing.go` loads the partner, resolves the price id from `STRIPE_PRICE_MONTHLY` /
+   `STRIPE_PRICE_ANNUAL`, and calls Stripe `V1CheckoutSessions.Create` with
+   `client_reference_id = partner.id` and `metadata{partner_id, plan}` on both the session and the
+   subscription.
+3. The SPA sets `window.location.href` to the returned Checkout URL. The admin pays on Stripe's
+   hosted page.
+4. Stripe redirects the browser to `success_url` = `<base>/partners/<id>?checkout=success`
+   (`<base>` = `PUBLIC_BASE_URL`, else the request `Origin`).
+5. **Asynchronously**, Stripe posts `checkout.session.completed` to **`POST /stripe/webhook`**. The
+   handler verifies the HMAC signature over the raw body (INV-4c), resolves the partner from
+   `client_reference_id`, writes `stripe_customer_id`/`stripe_subscription_id`/`subscription_plan`/
+   `subscription_status='active'` via `apidb.SetSubscription`, and appends a `subscription` activity.
+6. `customer.subscription.updated|deleted` later move the partner to `past_due` / `canceled` the same
+   way, resolving the partner from the subscription metadata or `stripe_subscription_id`.
+
+**The redirect races the webhook.** Step 4 usually lands before step 5, so `PartnerDetail` re-fetches
+the partner a few times on `?checkout=success` until the subscription appears, rather than rendering
+"Not subscribed" straight after a successful payment.
+
+Replays are safe: `applySubscription` no-ops when the state already matches (INV-4d).
+
 ## Seeding (out-of-band)
 `cmd/seed/main.go` opens the DB directly (env `PG*`), and if `partners` is empty inserts ~30 partners
 + activities via the same `apidb` helpers (idempotent: skips when rows exist). Not part of any RPC

@@ -1,4 +1,10 @@
-import { BillingStatus, Status, Tier } from "../gen/sample/v1/partner_pb";
+import {
+  BillingStatus,
+  Status,
+  SubscriptionPlan,
+  SubscriptionStatus,
+  Tier,
+} from "../gen/sample/v1/partner_pb";
 
 export function tierLabel(tier: Tier): string {
   switch (tier) {
@@ -53,6 +59,44 @@ export function billingLabel(billing: BillingStatus): string {
   }
 }
 
+export function planLabel(plan: SubscriptionPlan): string {
+  switch (plan) {
+    case SubscriptionPlan.MONTHLY:
+      return "Monthly";
+    case SubscriptionPlan.ANNUAL:
+      return "Annual";
+    default:
+      return "—";
+  }
+}
+
+export function subscriptionLabel(status: SubscriptionStatus): string {
+  switch (status) {
+    case SubscriptionStatus.ACTIVE:
+      return "Active";
+    case SubscriptionStatus.PAST_DUE:
+      return "Past due";
+    case SubscriptionStatus.CANCELED:
+      return "Canceled";
+    default:
+      return "Not subscribed";
+  }
+}
+
+// subscriptionModifier returns the CSS modifier suffix for a subscription badge.
+export function subscriptionModifier(status: SubscriptionStatus): string {
+  switch (status) {
+    case SubscriptionStatus.ACTIVE:
+      return "active";
+    case SubscriptionStatus.PAST_DUE:
+      return "pending";
+    case SubscriptionStatus.CANCELED:
+      return "churned";
+    default:
+      return "unknown";
+  }
+}
+
 // parseTier maps a free-text tier (e.g. from a CSV cell) to the Tier enum.
 // Unknown/blank values map to STARTER so imports still succeed.
 export function parseTier(text: string): Tier {
@@ -94,4 +138,9 @@ export const STATUS_OPTIONS: { value: Status; label: string }[] = [
   { value: Status.PENDING, label: "Pending" },
   { value: Status.ACTIVE, label: "Active" },
   { value: Status.CHURNED, label: "Churned" },
+];
+
+export const PLAN_OPTIONS: { value: SubscriptionPlan; label: string }[] = [
+  { value: SubscriptionPlan.MONTHLY, label: "Subscribe monthly" },
+  { value: SubscriptionPlan.ANNUAL, label: "Subscribe annually" },
 ];

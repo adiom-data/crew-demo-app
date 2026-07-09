@@ -212,16 +212,18 @@ func validateEmail(email string) error {
 
 func toProtoPartner(p apidb.Partner) *samplev1.Partner {
 	return &samplev1.Partner{
-		Id:            p.ID,
-		Name:          p.Name,
-		ContactEmail:  p.ContactEmail,
-		Company:       p.Company,
-		Region:        p.Region,
-		Tier:          textToTier(p.Tier),
-		Status:        textToStatus(p.Status),
-		BillingStatus: textToBilling(p.BillingStatus),
-		Notes:         p.Notes,
-		CreatedAt:     p.CreatedAt.UTC().Format(time.RFC3339),
+		Id:                 p.ID,
+		Name:               p.Name,
+		ContactEmail:       p.ContactEmail,
+		Company:            p.Company,
+		Region:             p.Region,
+		Tier:               textToTier(p.Tier),
+		Status:             textToStatus(p.Status),
+		BillingStatus:      textToBilling(p.BillingStatus),
+		Notes:              p.Notes,
+		CreatedAt:          p.CreatedAt.UTC().Format(time.RFC3339),
+		SubscriptionPlan:   textToSubscriptionPlan(p.SubscriptionPlan),
+		SubscriptionStatus: textToSubscriptionStatus(p.SubscriptionStatus),
 	}
 }
 
@@ -297,6 +299,44 @@ func textToBilling(s string) samplev1.BillingStatus {
 		return samplev1.BillingStatus_BILLING_STATUS_TRIALING
 	default:
 		return samplev1.BillingStatus_BILLING_STATUS_UNSPECIFIED
+	}
+}
+
+// An empty subscription column means the partner has never subscribed, which
+// maps to the UNSPECIFIED enum value in both directions.
+
+func subscriptionPlanToText(p samplev1.SubscriptionPlan) string {
+	switch p {
+	case samplev1.SubscriptionPlan_SUBSCRIPTION_PLAN_MONTHLY:
+		return "monthly"
+	case samplev1.SubscriptionPlan_SUBSCRIPTION_PLAN_ANNUAL:
+		return "annual"
+	default:
+		return ""
+	}
+}
+
+func textToSubscriptionPlan(s string) samplev1.SubscriptionPlan {
+	switch s {
+	case "monthly":
+		return samplev1.SubscriptionPlan_SUBSCRIPTION_PLAN_MONTHLY
+	case "annual":
+		return samplev1.SubscriptionPlan_SUBSCRIPTION_PLAN_ANNUAL
+	default:
+		return samplev1.SubscriptionPlan_SUBSCRIPTION_PLAN_UNSPECIFIED
+	}
+}
+
+func textToSubscriptionStatus(s string) samplev1.SubscriptionStatus {
+	switch s {
+	case "active":
+		return samplev1.SubscriptionStatus_SUBSCRIPTION_STATUS_ACTIVE
+	case "past_due":
+		return samplev1.SubscriptionStatus_SUBSCRIPTION_STATUS_PAST_DUE
+	case "canceled":
+		return samplev1.SubscriptionStatus_SUBSCRIPTION_STATUS_CANCELED
+	default:
+		return samplev1.SubscriptionStatus_SUBSCRIPTION_STATUS_UNSPECIFIED
 	}
 }
 

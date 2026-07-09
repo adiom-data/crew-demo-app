@@ -4,6 +4,7 @@ go_library(
     name = "samplev1connect",
     srcs = [
         "agentquery.connect.go",
+        "billing.connect.go",
         "partner.connect.go",
         "sample.connect.go",
     ],

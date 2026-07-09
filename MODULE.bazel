@@ -94,6 +94,7 @@ use_repo(
     "com_github_caarlos0_env_v11",
     "com_github_jackc_pgx_v5",
     "com_github_mark3labs_mcp_go",
+    "com_github_stripe_stripe_go_v86",
     "org_golang_google_protobuf",
     "org_golang_x_net",
     "org_golang_x_oauth2",

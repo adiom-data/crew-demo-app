@@ -16,6 +16,7 @@ type Config struct {
 	DB       DBConfig
 	Auth     AuthConfig
 	AgentMCP AgentMCPConfig
+	Stripe   StripeConfig
 }
 
 // AgentMCPConfig configures the unauthenticated /mcp endpoint exposed to the AdiomBot
@@ -70,6 +71,11 @@ func Run(cfg Config) error {
 		}),
 	)
 
+	billing := newBillingService(db, cfg.Stripe, cfg.Auth.PublicBaseURL)
+	if !cfg.Stripe.enabled() {
+		slog.Warn("billing disabled: stripe is not configured")
+	}
+
 	services := []httpapp.ConnectService{
 		httpapp.ConnectHandler[samplev1connect.SampleServiceHandler](
 			samplev1connect.SampleServiceName,
@@ -97,6 +103,14 @@ func Run(cfg Config) error {
 			samplev1connect.NewAgentQueryServiceHandler,
 			agentQueryService{db: db},
 		),
+		// BillingService is admin-only: same bearer auth as PartnerService. The
+		// Stripe webhook it pairs with is a separate, public raw route below.
+		httpapp.ConnectHandler[samplev1connect.BillingServiceHandler](
+			samplev1connect.BillingServiceName,
+			samplev1connect.NewBillingServiceHandler,
+			billing,
+			httpapp.WithInterceptors(tokenissuer.ConnectAuth(authenticator)),
+		),
 	}
 	services = append(services, authService.ConnectServices...)
 
@@ -106,6 +120,7 @@ func Run(cfg Config) error {
 	}
 	routes := append([]httpapp.Route{}, authService.Routes...)
 	routes = append(routes, httpapp.Handle("/mcp", newAgentMCPHandler(selfBaseURL)))
+	routes = append(routes, httpapp.Handle("/stripe/webhook", billing.webhookHandler()))
 
 	return runtime.NewService(
 		httpapp.WithServices(services...),

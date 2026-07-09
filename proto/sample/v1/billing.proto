@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package sample.v1;
+
+option go_package = "github.com/adiom-data/crew-demo-app/gen/go/sample/v1;samplev1";
+
+import "sample/v1/partner.proto";
+
+// BillingService is the authenticated admin-facing billing API. It is its own
+// service (rather than methods on PartnerService) because the gateway marks
+// whole path prefixes public or protected.
+service BillingService {
+  // CreateCheckoutSession starts a Stripe Checkout session for a partner and
+  // returns the hosted URL the browser should be redirected to.
+  rpc CreateCheckoutSession(CreateCheckoutSessionRequest) returns (CreateCheckoutSessionResponse);
+}
+
+message CreateCheckoutSessionRequest {
+  string partner_id = 1;
+  SubscriptionPlan plan = 2;
+}
+
+message CreateCheckoutSessionResponse {
+  string checkout_url = 1;
+}

@@ -180,6 +180,111 @@ func (BillingStatus) EnumDescriptor() ([]byte, []int) {
 	return file_sample_v1_partner_proto_rawDescGZIP(), []int{2}
 }
 
+// SubscriptionPlan is the billing interval of the partner's Stripe subscription.
+// UNSPECIFIED means the partner has never subscribed.
+type SubscriptionPlan int32
+
+const (
+	SubscriptionPlan_SUBSCRIPTION_PLAN_UNSPECIFIED SubscriptionPlan = 0
+	SubscriptionPlan_SUBSCRIPTION_PLAN_MONTHLY     SubscriptionPlan = 1
+	SubscriptionPlan_SUBSCRIPTION_PLAN_ANNUAL      SubscriptionPlan = 2
+)
+
+// Enum value maps for SubscriptionPlan.
+var (
+	SubscriptionPlan_name = map[int32]string{
+		0: "SUBSCRIPTION_PLAN_UNSPECIFIED",
+		1: "SUBSCRIPTION_PLAN_MONTHLY",
+		2: "SUBSCRIPTION_PLAN_ANNUAL",
+	}
+	SubscriptionPlan_value = map[string]int32{
+		"SUBSCRIPTION_PLAN_UNSPECIFIED": 0,
+		"SUBSCRIPTION_PLAN_MONTHLY":     1,
+		"SUBSCRIPTION_PLAN_ANNUAL":      2,
+	}
+)
+
+func (x SubscriptionPlan) Enum() *SubscriptionPlan {
+	p := new(SubscriptionPlan)
+	*p = x
+	return p
+}
+
+func (x SubscriptionPlan) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SubscriptionPlan) Descriptor() protoreflect.EnumDescriptor {
+	return file_sample_v1_partner_proto_enumTypes[3].Descriptor()
+}
+
+func (SubscriptionPlan) Type() protoreflect.EnumType {
+	return &file_sample_v1_partner_proto_enumTypes[3]
+}
+
+func (x SubscriptionPlan) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SubscriptionPlan.Descriptor instead.
+func (SubscriptionPlan) EnumDescriptor() ([]byte, []int) {
+	return file_sample_v1_partner_proto_rawDescGZIP(), []int{3}
+}
+
+// SubscriptionStatus is the state of the partner's Stripe subscription.
+// UNSPECIFIED means the partner has never subscribed.
+type SubscriptionStatus int32
+
+const (
+	SubscriptionStatus_SUBSCRIPTION_STATUS_UNSPECIFIED SubscriptionStatus = 0
+	SubscriptionStatus_SUBSCRIPTION_STATUS_ACTIVE      SubscriptionStatus = 1
+	SubscriptionStatus_SUBSCRIPTION_STATUS_PAST_DUE    SubscriptionStatus = 2
+	SubscriptionStatus_SUBSCRIPTION_STATUS_CANCELED    SubscriptionStatus = 3
+)
+
+// Enum value maps for SubscriptionStatus.
+var (
+	SubscriptionStatus_name = map[int32]string{
+		0: "SUBSCRIPTION_STATUS_UNSPECIFIED",
+		1: "SUBSCRIPTION_STATUS_ACTIVE",
+		2: "SUBSCRIPTION_STATUS_PAST_DUE",
+		3: "SUBSCRIPTION_STATUS_CANCELED",
+	}
+	SubscriptionStatus_value = map[string]int32{
+		"SUBSCRIPTION_STATUS_UNSPECIFIED": 0,
+		"SUBSCRIPTION_STATUS_ACTIVE":      1,
+		"SUBSCRIPTION_STATUS_PAST_DUE":    2,
+		"SUBSCRIPTION_STATUS_CANCELED":    3,
+	}
+)
+
+func (x SubscriptionStatus) Enum() *SubscriptionStatus {
+	p := new(SubscriptionStatus)
+	*p = x
+	return p
+}
+
+func (x SubscriptionStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SubscriptionStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_sample_v1_partner_proto_enumTypes[4].Descriptor()
+}
+
+func (SubscriptionStatus) Type() protoreflect.EnumType {
+	return &file_sample_v1_partner_proto_enumTypes[4]
+}
+
+func (x SubscriptionStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SubscriptionStatus.Descriptor instead.
+func (SubscriptionStatus) EnumDescriptor() ([]byte, []int) {
+	return file_sample_v1_partner_proto_rawDescGZIP(), []int{4}
+}
+
 type Partner struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -192,9 +297,11 @@ type Partner struct {
 	BillingStatus BillingStatus          `protobuf:"varint,8,opt,name=billing_status,json=billingStatus,proto3,enum=sample.v1.BillingStatus" json:"billing_status,omitempty"`
 	Notes         string                 `protobuf:"bytes,9,opt,name=notes,proto3" json:"notes,omitempty"`
 	// created_at is an RFC 3339 timestamp string.
-	CreatedAt     string `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	CreatedAt          string             `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	SubscriptionPlan   SubscriptionPlan   `protobuf:"varint,11,opt,name=subscription_plan,json=subscriptionPlan,proto3,enum=sample.v1.SubscriptionPlan" json:"subscription_plan,omitempty"`
+	SubscriptionStatus SubscriptionStatus `protobuf:"varint,12,opt,name=subscription_status,json=subscriptionStatus,proto3,enum=sample.v1.SubscriptionStatus" json:"subscription_status,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Partner) Reset() {
@@ -295,6 +402,20 @@ func (x *Partner) GetCreatedAt() string {
 		return x.CreatedAt
 	}
 	return ""
+}
+
+func (x *Partner) GetSubscriptionPlan() SubscriptionPlan {
+	if x != nil {
+		return x.SubscriptionPlan
+	}
+	return SubscriptionPlan_SUBSCRIPTION_PLAN_UNSPECIFIED
+}
+
+func (x *Partner) GetSubscriptionStatus() SubscriptionStatus {
+	if x != nil {
+		return x.SubscriptionStatus
+	}
+	return SubscriptionStatus_SUBSCRIPTION_STATUS_UNSPECIFIED
 }
 
 type Activity struct {
@@ -1140,7 +1261,7 @@ var File_sample_v1_partner_proto protoreflect.FileDescriptor
 
 const file_sample_v1_partner_proto_rawDesc = "" +
 	"\n" +
-	"\x17sample/v1/partner.proto\x12\tsample.v1\"\xca\x02\n" +
+	"\x17sample/v1/partner.proto\x12\tsample.v1\"\xe4\x03\n" +
 	"\aPartner\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12#\n" +
@@ -1153,7 +1274,9 @@ const file_sample_v1_partner_proto_rawDesc = "" +
 	"\x05notes\x18\t \x01(\tR\x05notes\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\n" +
-	" \x01(\tR\tcreatedAt\"\x86\x01\n" +
+	" \x01(\tR\tcreatedAt\x12H\n" +
+	"\x11subscription_plan\x18\v \x01(\x0e2\x1b.sample.v1.SubscriptionPlanR\x10subscriptionPlan\x12N\n" +
+	"\x13subscription_status\x18\f \x01(\x0e2\x1d.sample.v1.SubscriptionStatusR\x12subscriptionStatus\"\x86\x01\n" +
 	"\bActivity\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1225,7 +1348,16 @@ const file_sample_v1_partner_proto_rawDesc = "" +
 	"\x1aBILLING_STATUS_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16BILLING_STATUS_CURRENT\x10\x01\x12\x1b\n" +
 	"\x17BILLING_STATUS_PAST_DUE\x10\x02\x12\x1b\n" +
-	"\x17BILLING_STATUS_TRIALING\x10\x032\xc9\x03\n" +
+	"\x17BILLING_STATUS_TRIALING\x10\x03*r\n" +
+	"\x10SubscriptionPlan\x12!\n" +
+	"\x1dSUBSCRIPTION_PLAN_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19SUBSCRIPTION_PLAN_MONTHLY\x10\x01\x12\x1c\n" +
+	"\x18SUBSCRIPTION_PLAN_ANNUAL\x10\x02*\x9d\x01\n" +
+	"\x12SubscriptionStatus\x12#\n" +
+	"\x1fSUBSCRIPTION_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aSUBSCRIPTION_STATUS_ACTIVE\x10\x01\x12 \n" +
+	"\x1cSUBSCRIPTION_STATUS_PAST_DUE\x10\x02\x12 \n" +
+	"\x1cSUBSCRIPTION_STATUS_CANCELED\x10\x032\xc9\x03\n" +
 	"\x0ePartnerService\x12O\n" +
 	"\fListPartners\x12\x1e.sample.v1.ListPartnersRequest\x1a\x1f.sample.v1.ListPartnersResponse\x12I\n" +
 	"\n" +
@@ -1248,60 +1380,64 @@ func file_sample_v1_partner_proto_rawDescGZIP() []byte {
 	return file_sample_v1_partner_proto_rawDescData
 }
 
-var file_sample_v1_partner_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_sample_v1_partner_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_sample_v1_partner_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_sample_v1_partner_proto_goTypes = []any{
 	(Tier)(0),                           // 0: sample.v1.Tier
 	(Status)(0),                         // 1: sample.v1.Status
 	(BillingStatus)(0),                  // 2: sample.v1.BillingStatus
-	(*Partner)(nil),                     // 3: sample.v1.Partner
-	(*Activity)(nil),                    // 4: sample.v1.Activity
-	(*ListPartnersRequest)(nil),         // 5: sample.v1.ListPartnersRequest
-	(*ListPartnersResponse)(nil),        // 6: sample.v1.ListPartnersResponse
-	(*GetPartnerRequest)(nil),           // 7: sample.v1.GetPartnerRequest
-	(*GetPartnerResponse)(nil),          // 8: sample.v1.GetPartnerResponse
-	(*CreatePartnerRequest)(nil),        // 9: sample.v1.CreatePartnerRequest
-	(*CreatePartnerResponse)(nil),       // 10: sample.v1.CreatePartnerResponse
-	(*UpdatePartnerStatusRequest)(nil),  // 11: sample.v1.UpdatePartnerStatusRequest
-	(*UpdatePartnerStatusResponse)(nil), // 12: sample.v1.UpdatePartnerStatusResponse
-	(*PartnerInput)(nil),                // 13: sample.v1.PartnerInput
-	(*RowError)(nil),                    // 14: sample.v1.RowError
-	(*BulkImportPartnersRequest)(nil),   // 15: sample.v1.BulkImportPartnersRequest
-	(*BulkImportPartnersResponse)(nil),  // 16: sample.v1.BulkImportPartnersResponse
-	(*SubmitOnboardingRequest)(nil),     // 17: sample.v1.SubmitOnboardingRequest
-	(*SubmitOnboardingResponse)(nil),    // 18: sample.v1.SubmitOnboardingResponse
+	(SubscriptionPlan)(0),               // 3: sample.v1.SubscriptionPlan
+	(SubscriptionStatus)(0),             // 4: sample.v1.SubscriptionStatus
+	(*Partner)(nil),                     // 5: sample.v1.Partner
+	(*Activity)(nil),                    // 6: sample.v1.Activity
+	(*ListPartnersRequest)(nil),         // 7: sample.v1.ListPartnersRequest
+	(*ListPartnersResponse)(nil),        // 8: sample.v1.ListPartnersResponse
+	(*GetPartnerRequest)(nil),           // 9: sample.v1.GetPartnerRequest
+	(*GetPartnerResponse)(nil),          // 10: sample.v1.GetPartnerResponse
+	(*CreatePartnerRequest)(nil),        // 11: sample.v1.CreatePartnerRequest
+	(*CreatePartnerResponse)(nil),       // 12: sample.v1.CreatePartnerResponse
+	(*UpdatePartnerStatusRequest)(nil),  // 13: sample.v1.UpdatePartnerStatusRequest
+	(*UpdatePartnerStatusResponse)(nil), // 14: sample.v1.UpdatePartnerStatusResponse
+	(*PartnerInput)(nil),                // 15: sample.v1.PartnerInput
+	(*RowError)(nil),                    // 16: sample.v1.RowError
+	(*BulkImportPartnersRequest)(nil),   // 17: sample.v1.BulkImportPartnersRequest
+	(*BulkImportPartnersResponse)(nil),  // 18: sample.v1.BulkImportPartnersResponse
+	(*SubmitOnboardingRequest)(nil),     // 19: sample.v1.SubmitOnboardingRequest
+	(*SubmitOnboardingResponse)(nil),    // 20: sample.v1.SubmitOnboardingResponse
 }
 var file_sample_v1_partner_proto_depIdxs = []int32{
 	0,  // 0: sample.v1.Partner.tier:type_name -> sample.v1.Tier
 	1,  // 1: sample.v1.Partner.status:type_name -> sample.v1.Status
 	2,  // 2: sample.v1.Partner.billing_status:type_name -> sample.v1.BillingStatus
-	3,  // 3: sample.v1.ListPartnersResponse.partners:type_name -> sample.v1.Partner
-	3,  // 4: sample.v1.GetPartnerResponse.partner:type_name -> sample.v1.Partner
-	4,  // 5: sample.v1.GetPartnerResponse.activities:type_name -> sample.v1.Activity
-	0,  // 6: sample.v1.CreatePartnerRequest.tier:type_name -> sample.v1.Tier
-	3,  // 7: sample.v1.CreatePartnerResponse.partner:type_name -> sample.v1.Partner
-	1,  // 8: sample.v1.UpdatePartnerStatusRequest.status:type_name -> sample.v1.Status
-	3,  // 9: sample.v1.UpdatePartnerStatusResponse.partner:type_name -> sample.v1.Partner
-	0,  // 10: sample.v1.PartnerInput.tier:type_name -> sample.v1.Tier
-	13, // 11: sample.v1.BulkImportPartnersRequest.rows:type_name -> sample.v1.PartnerInput
-	14, // 12: sample.v1.BulkImportPartnersResponse.errors:type_name -> sample.v1.RowError
-	5,  // 13: sample.v1.PartnerService.ListPartners:input_type -> sample.v1.ListPartnersRequest
-	7,  // 14: sample.v1.PartnerService.GetPartner:input_type -> sample.v1.GetPartnerRequest
-	9,  // 15: sample.v1.PartnerService.CreatePartner:input_type -> sample.v1.CreatePartnerRequest
-	11, // 16: sample.v1.PartnerService.UpdatePartnerStatus:input_type -> sample.v1.UpdatePartnerStatusRequest
-	15, // 17: sample.v1.PartnerService.BulkImportPartners:input_type -> sample.v1.BulkImportPartnersRequest
-	17, // 18: sample.v1.OnboardingService.SubmitOnboarding:input_type -> sample.v1.SubmitOnboardingRequest
-	6,  // 19: sample.v1.PartnerService.ListPartners:output_type -> sample.v1.ListPartnersResponse
-	8,  // 20: sample.v1.PartnerService.GetPartner:output_type -> sample.v1.GetPartnerResponse
-	10, // 21: sample.v1.PartnerService.CreatePartner:output_type -> sample.v1.CreatePartnerResponse
-	12, // 22: sample.v1.PartnerService.UpdatePartnerStatus:output_type -> sample.v1.UpdatePartnerStatusResponse
-	16, // 23: sample.v1.PartnerService.BulkImportPartners:output_type -> sample.v1.BulkImportPartnersResponse
-	18, // 24: sample.v1.OnboardingService.SubmitOnboarding:output_type -> sample.v1.SubmitOnboardingResponse
-	19, // [19:25] is the sub-list for method output_type
-	13, // [13:19] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	3,  // 3: sample.v1.Partner.subscription_plan:type_name -> sample.v1.SubscriptionPlan
+	4,  // 4: sample.v1.Partner.subscription_status:type_name -> sample.v1.SubscriptionStatus
+	5,  // 5: sample.v1.ListPartnersResponse.partners:type_name -> sample.v1.Partner
+	5,  // 6: sample.v1.GetPartnerResponse.partner:type_name -> sample.v1.Partner
+	6,  // 7: sample.v1.GetPartnerResponse.activities:type_name -> sample.v1.Activity
+	0,  // 8: sample.v1.CreatePartnerRequest.tier:type_name -> sample.v1.Tier
+	5,  // 9: sample.v1.CreatePartnerResponse.partner:type_name -> sample.v1.Partner
+	1,  // 10: sample.v1.UpdatePartnerStatusRequest.status:type_name -> sample.v1.Status
+	5,  // 11: sample.v1.UpdatePartnerStatusResponse.partner:type_name -> sample.v1.Partner
+	0,  // 12: sample.v1.PartnerInput.tier:type_name -> sample.v1.Tier
+	15, // 13: sample.v1.BulkImportPartnersRequest.rows:type_name -> sample.v1.PartnerInput
+	16, // 14: sample.v1.BulkImportPartnersResponse.errors:type_name -> sample.v1.RowError
+	7,  // 15: sample.v1.PartnerService.ListPartners:input_type -> sample.v1.ListPartnersRequest
+	9,  // 16: sample.v1.PartnerService.GetPartner:input_type -> sample.v1.GetPartnerRequest
+	11, // 17: sample.v1.PartnerService.CreatePartner:input_type -> sample.v1.CreatePartnerRequest
+	13, // 18: sample.v1.PartnerService.UpdatePartnerStatus:input_type -> sample.v1.UpdatePartnerStatusRequest
+	17, // 19: sample.v1.PartnerService.BulkImportPartners:input_type -> sample.v1.BulkImportPartnersRequest
+	19, // 20: sample.v1.OnboardingService.SubmitOnboarding:input_type -> sample.v1.SubmitOnboardingRequest
+	8,  // 21: sample.v1.PartnerService.ListPartners:output_type -> sample.v1.ListPartnersResponse
+	10, // 22: sample.v1.PartnerService.GetPartner:output_type -> sample.v1.GetPartnerResponse
+	12, // 23: sample.v1.PartnerService.CreatePartner:output_type -> sample.v1.CreatePartnerResponse
+	14, // 24: sample.v1.PartnerService.UpdatePartnerStatus:output_type -> sample.v1.UpdatePartnerStatusResponse
+	18, // 25: sample.v1.PartnerService.BulkImportPartners:output_type -> sample.v1.BulkImportPartnersResponse
+	20, // 26: sample.v1.OnboardingService.SubmitOnboarding:output_type -> sample.v1.SubmitOnboardingResponse
+	21, // [21:27] is the sub-list for method output_type
+	15, // [15:21] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_sample_v1_partner_proto_init() }
@@ -1314,7 +1450,7 @@ func file_sample_v1_partner_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sample_v1_partner_proto_rawDesc), len(file_sample_v1_partner_proto_rawDesc)),
-			NumEnums:      3,
+			NumEnums:      5,
 			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   2,

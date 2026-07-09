@@ -46,8 +46,18 @@ WHERE revoked_at IS NULL`. Written by the framework `browserauth.SQLSessionStore
 | `status` | text NOT NULL default `'pending'` | enum: `pending` \| `active` \| `churned`. |
 | `billing_status` | text NOT NULL default `'current'` | enum: `current` \| `past_due` \| `trialing`. |
 | `created_at`, `updated_at` | timestamptz NOT NULL default `now()` | |
+| `stripe_customer_id` | text NOT NULL default `''` | Stripe `cus_…`; `''` until first checkout (`00003`). |
+| `stripe_subscription_id` | text NOT NULL default `''` | Stripe `sub_…`; `''` until first checkout (`00003`). |
+| `subscription_plan` | text NOT NULL default `''` | enum: `''` \| `monthly` \| `annual` (`00003`). |
+| `subscription_status` | text NOT NULL default `''` | enum: `''` \| `active` \| `past_due` \| `canceled` (`00003`). |
 
-Indexes: `partners_status_idx (status)`, `partners_created_at_idx (created_at DESC)`.
+Indexes: `partners_status_idx (status)`, `partners_created_at_idx (created_at DESC)`,
+`partners_stripe_subscription_idx (stripe_subscription_id) WHERE stripe_subscription_id <> ''`.
+
+**Subscription state is separate from `billing_status`** (`00003_add_subscription_columns.sql`).
+`billing_status` has no "never subscribed" value and defaults to `'current'`, so it cannot express
+the pre-checkout state; the four Stripe columns can. An empty `subscription_plan`/`subscription_status`
+means the partner has never subscribed and maps to the proto `*_UNSPECIFIED` enum value.
 
 ### `activities` — append-only per-partner log (`00002`)
 | Column | Type | Notes |
@@ -83,6 +93,8 @@ parameterized SQL. Proto types never appear here.
 | `GetActivities` | `internal/api/db/partner.go:91` | `SELECT … FROM activities WHERE partner_id=$1 ORDER BY created_at DESC` |
 | `CreatePartner` | `internal/api/db/partner.go:116` | `INSERT … coalesce(nullif($n,''),'starter'/'pending'/'current') … RETURNING …` |
 | `UpdatePartnerStatus` | `internal/api/db/partner.go:126` | `UPDATE partners SET status=$2, updated_at=now() WHERE id=$1 RETURNING …` |
+| `SetSubscription` | `internal/api/db/partner.go` | `UPDATE partners SET stripe_customer_id=$2, stripe_subscription_id=$3, subscription_plan=$4, subscription_status=$5 … RETURNING …` |
+| `GetPartnerBySubscriptionID` | `internal/api/db/partner.go` | `SELECT … WHERE stripe_subscription_id=$1` |
 | `InsertActivity` | `internal/api/db/partner.go:136` | `INSERT INTO activities (partner_id,type,message) RETURNING …` |
 
 ## Migrations & ownership

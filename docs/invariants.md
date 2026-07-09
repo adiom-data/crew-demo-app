@@ -50,13 +50,37 @@ Statements that MUST hold for the system to operate correctly — a fusion of pr
   (`Services` filter pins the exposed service), gateway `/mcp` route. `<PARTIAL>` — no automated
   check; keep the service read-only by review.
 
+## INV-4c: The Stripe webhook verifies the raw body before decoding it
+- **Statement:** `POST /stripe/webhook` is public and unauthenticated; its only authentication is the
+  `Stripe-Signature` HMAC, which MUST be verified over the **exact bytes** of the request body before
+  the payload is decoded or acted on. The body must never be re-marshalled before verification.
+- **Rationale:** The endpoint mutates partner subscription state with no bearer token. Re-encoding the
+  body changes the bytes and silently invalidates the signature; skipping verification would let anyone
+  mark any partner subscribed.
+- **Corollary:** verification passes `IgnoreAPIVersionMismatch: true`, because `stripe-go` pins
+  `stripe.APIVersion` and otherwise rejects events from an account on an older API release train.
+  Tolerance checking stays on.
+- **Enforcement:** `internal/api/billing.go` (`webhookHandler` → `io.ReadAll` →
+  `webhook.ConstructEventWithOptions`); gateway `/stripe/webhook` route is `public: true` and the
+  route is registered without `tokenissuer.ConnectAuth`. Covered by `internal/api/billing_test.go`.
+
+## INV-4d: Webhook handling is idempotent
+- **Statement:** Processing the same Stripe event more than once MUST NOT change state twice or append
+  a duplicate `activities` row.
+- **Rationale:** Stripe retries delivery until it sees a 2xx, and delivers at-least-once. The handler
+  returns 5xx on failure precisely so Stripe retries, which makes idempotency load-bearing.
+- **Enforcement:** `applySubscription` (`internal/api/billing.go`) reads the partner first and returns
+  early when the subscription id, plan and status already match the target state.
+
 ## INV-5: Partner creation and status changes are logged
-- **Statement:** Creating a partner, submitting onboarding, and changing status MUST append an
-  `activities` row.
+- **Statement:** Creating a partner, submitting onboarding, changing status, and changing subscription
+  state MUST append an `activities` row.
 - **Rationale:** The activity log is the audit trail shown on partner detail.
 - **Source:** PRD §7; [data-flows.md](data-flows.md).
 - **Enforcement:** `CreatePartner`→`InsertActivity("created")`, `UpdatePartnerStatus`→`InsertActivity
-  ("status_changed")`, `SubmitOnboarding`→`InsertActivity("submitted")` (`internal/api/partner.go`).
+  ("status_changed")`, `SubmitOnboarding`→`InsertActivity("submitted")` (`internal/api/partner.go`);
+  `applySubscription`→`InsertActivity("subscription")` (`internal/api/billing.go`, subject to the
+  idempotency early-return of INV-4d).
   `<PARTIAL>` — **`BulkImportPartners` does not log an activity per imported row** (known gap).
 
 ## INV-6: Bulk import is best-effort per row

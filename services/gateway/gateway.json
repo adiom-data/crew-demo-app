@@ -16,11 +16,18 @@
           "path": "/sample.v1.PartnerService/"
         },
         {
+          "path": "/sample.v1.BillingService/"
+        },
+        {
           "path": "/sample.v1.OnboardingService/",
           "public": true
         },
         {
           "path": "/mcp",
+          "public": true
+        },
+        {
+          "path": "/stripe/webhook",
           "public": true
         },
         {

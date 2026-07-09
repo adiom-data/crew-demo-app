@@ -28,6 +28,23 @@ enum BillingStatus {
   BILLING_STATUS_TRIALING = 3;
 }
 
+// SubscriptionPlan is the billing interval of the partner's Stripe subscription.
+// UNSPECIFIED means the partner has never subscribed.
+enum SubscriptionPlan {
+  SUBSCRIPTION_PLAN_UNSPECIFIED = 0;
+  SUBSCRIPTION_PLAN_MONTHLY = 1;
+  SUBSCRIPTION_PLAN_ANNUAL = 2;
+}
+
+// SubscriptionStatus is the state of the partner's Stripe subscription.
+// UNSPECIFIED means the partner has never subscribed.
+enum SubscriptionStatus {
+  SUBSCRIPTION_STATUS_UNSPECIFIED = 0;
+  SUBSCRIPTION_STATUS_ACTIVE = 1;
+  SUBSCRIPTION_STATUS_PAST_DUE = 2;
+  SUBSCRIPTION_STATUS_CANCELED = 3;
+}
+
 message Partner {
   string id = 1;
   string name = 2;
@@ -40,6 +57,8 @@ message Partner {
   string notes = 9;
   // created_at is an RFC 3339 timestamp string.
   string created_at = 10;
+  SubscriptionPlan subscription_plan = 11;
+  SubscriptionStatus subscription_status = 12;
 }
 
 message Activity {

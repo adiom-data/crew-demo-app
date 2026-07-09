@@ -7,19 +7,24 @@ import (
 )
 
 // Partner mirrors a row of the partners table. Enum-like columns (tier, status,
-// billing_status) are stored as lowercase text and mapped to proto enums by the
-// service layer, keeping this package free of any proto dependency.
+// billing_status, subscription_plan, subscription_status) are stored as lowercase
+// text and mapped to proto enums by the service layer, keeping this package free
+// of any proto dependency. Empty subscription columns mean "never subscribed".
 type Partner struct {
-	ID            string
-	Name          string
-	ContactEmail  string
-	Company       string
-	Region        string
-	Tier          string
-	Status        string
-	BillingStatus string
-	Notes         string
-	CreatedAt     time.Time
+	ID                   string
+	Name                 string
+	ContactEmail         string
+	Company              string
+	Region               string
+	Tier                 string
+	Status               string
+	BillingStatus        string
+	Notes                string
+	CreatedAt            time.Time
+	StripeCustomerID     string
+	StripeSubscriptionID string
+	SubscriptionPlan     string
+	SubscriptionStatus   string
 }
 
 // Activity mirrors a row of the activities table.
@@ -31,13 +36,15 @@ type Activity struct {
 	CreatedAt time.Time
 }
 
-const partnerColumns = `id, name, contact_email, company, region, tier, status, billing_status, notes, created_at`
+const partnerColumns = `id, name, contact_email, company, region, tier, status, billing_status, notes, created_at, ` +
+	`stripe_customer_id, stripe_subscription_id, subscription_plan, subscription_status`
 
 func scanPartner(row interface{ Scan(...any) error }) (Partner, error) {
 	var p Partner
 	err := row.Scan(
 		&p.ID, &p.Name, &p.ContactEmail, &p.Company, &p.Region,
 		&p.Tier, &p.Status, &p.BillingStatus, &p.Notes, &p.CreatedAt,
+		&p.StripeCustomerID, &p.StripeSubscriptionID, &p.SubscriptionPlan, &p.SubscriptionStatus,
 	)
 	return p, err
 }
@@ -129,6 +136,29 @@ update partners set status = $2, updated_at = now()
 where id = $1
 returning `+partnerColumns+`
 `, id, status)
+	return scanPartner(row)
+}
+
+// SetSubscription records a partner's Stripe subscription state and returns the
+// stored row.
+func SetSubscription(ctx context.Context, db *sql.DB, id, customerID, subscriptionID, plan, status string) (Partner, error) {
+	row := db.QueryRowContext(ctx, `
+update partners set
+  stripe_customer_id = $2,
+  stripe_subscription_id = $3,
+  subscription_plan = $4,
+  subscription_status = $5,
+  updated_at = now()
+where id = $1
+returning `+partnerColumns+`
+`, id, customerID, subscriptionID, plan, status)
+	return scanPartner(row)
+}
+
+// GetPartnerBySubscriptionID returns the partner owning a Stripe subscription.
+// Returns sql.ErrNoRows if absent.
+func GetPartnerBySubscriptionID(ctx context.Context, db *sql.DB, subscriptionID string) (Partner, error) {
+	row := db.QueryRowContext(ctx, `select `+partnerColumns+` from partners where stripe_subscription_id = $1`, subscriptionID)
 	return scanPartner(row)
 }
 

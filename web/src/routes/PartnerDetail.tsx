@@ -1,31 +1,86 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { partnerClient } from "../api/clients";
-import { Status, type Activity, type Partner } from "../gen/sample/v1/partner_pb";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { billingClient, partnerClient } from "../api/clients";
+import {
+  Status,
+  SubscriptionStatus,
+  type Activity,
+  type Partner,
+  type SubscriptionPlan,
+} from "../gen/sample/v1/partner_pb";
 import { errorMessage } from "../session";
-import { billingLabel, formatDate, STATUS_OPTIONS, tierLabel } from "../lib/format";
+import {
+  billingLabel,
+  formatDate,
+  planLabel,
+  PLAN_OPTIONS,
+  STATUS_OPTIONS,
+  subscriptionLabel,
+  tierLabel,
+} from "../lib/format";
 import { StatusBadge } from "../components/StatusBadge";
 
 export function PartnerDetail() {
   const { id = "" } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const checkout = searchParams.get("checkout");
 
   const load = useCallback(async () => {
     try {
       const res = await partnerClient.getPartner({ id });
       setPartner(res.partner ?? null);
       setActivities(res.activities);
+      return res.partner ?? null;
     } catch (err) {
       setError(errorMessage(err));
+      return null;
     }
   }, [id]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Stripe redirects the browser back as soon as payment succeeds, which can beat
+  // the checkout.session.completed webhook. Re-fetch a few times so the page
+  // doesn't sit on "Not subscribed" right after a successful checkout.
+  useEffect(() => {
+    if (checkout !== "success") return;
+    let cancelled = false;
+    let attempts = 0;
+    const tick = async () => {
+      if (cancelled) return;
+      const p = await load();
+      attempts += 1;
+      if (p && p.subscriptionStatus !== SubscriptionStatus.UNSPECIFIED) return;
+      if (attempts < 6) setTimeout(() => void tick(), 1000);
+    };
+    void tick();
+    return () => {
+      cancelled = true;
+    };
+  }, [checkout, load]);
+
+  function dismissBanner() {
+    searchParams.delete("checkout");
+    setSearchParams(searchParams, { replace: true });
+  }
+
+  async function subscribe(plan: SubscriptionPlan) {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await billingClient.createCheckoutSession({ partnerId: id, plan });
+      window.location.href = res.checkoutUrl;
+    } catch (err) {
+      setError(errorMessage(err));
+      setBusy(false);
+    }
+  }
 
   async function changeStatus(status: Status) {
     if (!partner || status === partner.status) return;
@@ -74,6 +129,17 @@ export function PartnerDetail() {
 
       {error && <p className="error">{error}</p>}
 
+      {checkout === "success" && (
+        <p className="notice" onClick={dismissBanner}>
+          Payment received. Activating the subscription…
+        </p>
+      )}
+      {checkout === "cancel" && (
+        <p className="notice" onClick={dismissBanner}>
+          Checkout was cancelled. No charge was made.
+        </p>
+      )}
+
       <dl className="facts">
         <div>
           <dt>Company</dt>
@@ -96,6 +162,14 @@ export function PartnerDetail() {
           <dd>{billingLabel(partner.billingStatus)}</dd>
         </div>
         <div>
+          <dt>Subscription</dt>
+          <dd>
+            {partner.subscriptionStatus === SubscriptionStatus.UNSPECIFIED
+              ? "Not subscribed"
+              : `${planLabel(partner.subscriptionPlan)} · ${subscriptionLabel(partner.subscriptionStatus)}`}
+          </dd>
+        </div>
+        <div>
           <dt>Joined</dt>
           <dd>{formatDate(partner.createdAt)}</dd>
         </div>
@@ -106,6 +180,28 @@ export function PartnerDetail() {
           </div>
         )}
       </dl>
+
+      <section className="detail-section">
+        <h3 className="section-title">Subscription</h3>
+        {partner.subscriptionStatus === SubscriptionStatus.ACTIVE ? (
+          <p className="muted">
+            Subscribed on the {planLabel(partner.subscriptionPlan).toLowerCase()} plan.
+          </p>
+        ) : (
+          <div className="actions">
+            {PLAN_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                className="button primary"
+                disabled={busy}
+                onClick={() => subscribe(opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="detail-section">
         <h3 className="section-title">Change status</h3>

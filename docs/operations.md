@@ -57,6 +57,19 @@ Full stack locally with real Google OIDC. Ports: Postgres `55432`, API `8080`, V
 The public `/onboard` form works without login; the dashboard requires Google sign-in. To tear down:
 `pkill -f cmd/api; pkill -f vite; docker rm -f crew-demo-pg`.
 
+### Stripe billing (optional locally)
+Omit the Stripe env and the API still runs — billing just reports `Unavailable`. To exercise it:
+
+1. `stripe listen --forward-to localhost:8080/stripe/webhook` — copy the printed `whsec_…`.
+2. Restart the API with `STRIPE_SECRET_KEY=sk_test_…`, `STRIPE_WEBHOOK_SECRET=whsec_…` (from step 1),
+   `STRIPE_PRICE_MONTHLY=price_…`, `STRIPE_PRICE_ANNUAL=price_…`.
+3. Open a partner → **Subscribe monthly** → pay with `4242 4242 4242 4242`, any future expiry/CVC/ZIP.
+4. The partner flips to `Monthly · Active` with a `subscription` activity row.
+   `stripe events resend <id>` must not add a second row (INV-4d).
+
+`PUBLIC_BASE_URL=http://localhost:5173` (already in the block above) is what the Checkout
+success/cancel URLs are built from.
+
 ## Migrations
 - goose SQL in `services/api/migrations/`, named `NNNNN_description.sql`, `-- +goose Up/Down`,
   idempotent (`if not exists`). The migrate image globs `*.sql` onto `/app/migrations`.

@@ -1,12 +1,13 @@
 # On-board (crew-demo-app) — Product Definition Document
 
-**Version:** 1.0
+**Version:** 1.1
 **Status:** Active
 **Last reviewed against commit:** 4a51902
 
 ## Changelog
 | Date | Version | Change | Commit |
 |------|---------|--------|--------|
+| 2026-07-09 | 1.1 | Adds Stripe subscription billing (monthly/annual checkout + webhook-driven state). | — |
 | 2026-06-30 | 1.0 | First full PRD; supersedes the original build brief. Documents the implemented "On-board" portal. | 4a51902 |
 | 2026-06-30 | 0.1 | Initial build brief ("Adiom Crew — Demo App Build Brief"). | 373d50e |
 
@@ -51,13 +52,18 @@ All implemented as of commit 4a51902 unless labelled otherwise.
   validates each row and returns a per-row error report; valid rows are imported.
 - **Public onboarding form** — unauthenticated self-submit that creates a partner with status
   `pending`.
+- **Subscription billing (Stripe)** — from partner detail an admin starts a real Stripe Checkout
+  session on a **monthly** or **annual** plan. Stripe webhooks drive the partner's subscription state
+  (`active` / `past_due` / `canceled`) and each change is logged as an activity. Billing is optional:
+  with no Stripe credentials configured the rest of the app runs unchanged.
 - **Seed data** — an idempotent seeder (`cmd/seed`) inserts ~30 realistic partners so the dashboard
   looks alive.
 
 ## 5. Core entities
 Grounded in the schema; see [docs/data-model.md](docs/data-model.md).
 - **Partner** — id, name, contact_email, company, region, tier (starter/pro/enterprise), status
-  (pending/active/churned), billing_status (current/past_due/trialing), notes, created_at.
+  (pending/active/churned), billing_status (current/past_due/trialing), notes, created_at, plus Stripe
+  subscription fields (stripe_customer_id, stripe_subscription_id, subscription_plan, subscription_status).
 - **Activity** — id, partner_id, type, message, created_at. Append-only log per partner.
 - **App user** (`app_users`) — an authenticated admin, keyed by OIDC `(issuer, subject)`.
 - **Auth session** (`auth_sessions`) — server-side browser-auth session holding the provider refresh
@@ -78,6 +84,9 @@ See [docs/workflows.md](docs/workflows.md) and [docs/data-flows.md](docs/data-fl
 - Partner and CSV input MUST be validated (non-empty name; syntactically valid contact email);
   invalid bulk-import rows MUST be reported per-row without aborting the whole import.
 - Every partner status change and creation MUST append an activity record.
+- Subscription state MUST be changed only by verified Stripe webhooks, never by the client: the
+  billing RPC only mints a Checkout URL. The webhook MUST verify its HMAC signature over the raw
+  request body and MUST be idempotent under Stripe's at-least-once redelivery.
 - The dashboard MUST show Total / Active / Pending counts consistent with the partners table.
 
 ## 8. Non-functional requirements

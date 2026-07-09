@@ -42,6 +42,13 @@ type environment struct {
 	OIDCAllowedAudiences []string `env:"OIDC_ALLOWED_AUDIENCES" envSeparator:","`
 
 	AgentMCPSelfBaseURL string `env:"AGENT_MCP_SELF_BASE_URL"`
+
+	// Stripe is optional: when unset, billing degrades to Unavailable so
+	// previews and local runs still boot. Supplied by the crew-demo-stripe secret.
+	StripeSecretKey     string `env:"STRIPE_SECRET_KEY"`
+	StripeWebhookSecret string `env:"STRIPE_WEBHOOK_SECRET"`
+	StripePriceMonthly  string `env:"STRIPE_PRICE_MONTHLY"`
+	StripePriceAnnual   string `env:"STRIPE_PRICE_ANNUAL"`
 }
 
 func configFromEnv() (api.Config, error) {
@@ -76,6 +83,12 @@ func configFromEnv() (api.Config, error) {
 		},
 		AgentMCP: api.AgentMCPConfig{
 			SelfBaseURL: e.AgentMCPSelfBaseURL,
+		},
+		Stripe: api.StripeConfig{
+			SecretKey:     e.StripeSecretKey,
+			WebhookSecret: e.StripeWebhookSecret,
+			PriceMonthly:  e.StripePriceMonthly,
+			PriceAnnual:   e.StripePriceAnnual,
 		},
 	}, nil
 }

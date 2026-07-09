@@ -85,6 +85,33 @@ spec:
                 secretKeyRef:
                   name: crew-demo-postgres-app
                   key: password
+            # Stripe billing. All optional: the API boots and serves everything
+            # else when the crew-demo-stripe secret is absent (previews), and
+            # billing reports Unavailable.
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: crew-demo-stripe
+                  key: STRIPE_SECRET_KEY
+                  optional: true
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: crew-demo-stripe
+                  key: STRIPE_WEBHOOK_SECRET
+                  optional: true
+            - name: STRIPE_PRICE_MONTHLY
+              valueFrom:
+                secretKeyRef:
+                  name: crew-demo-stripe
+                  key: STRIPE_PRICE_MONTHLY
+                  optional: true
+            - name: STRIPE_PRICE_ANNUAL
+              valueFrom:
+                secretKeyRef:
+                  name: crew-demo-stripe
+                  key: STRIPE_PRICE_ANNUAL
+                  optional: true
             - name: OTEL_SERVICE_NAME
               value: crew-demo-api
           readinessProbe:

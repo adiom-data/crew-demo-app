@@ -30,11 +30,13 @@ vite_bin.vite(
     srcs = [
         "index.html",
         "src/App.tsx",
+        "src/api/billingClient.ts",
         "src/api/clients.ts",
         "src/api/partnerClient.ts",
         "src/api/sampleClient.ts",
         "src/components/AppShell.tsx",
         "src/components/StatusBadge.tsx",
+        "src/gen/sample/v1/billing_pb.ts",
         "src/gen/sample/v1/partner_pb.ts",
         "src/gen/sample/v1/sample_pb.ts",
         "src/lib/csv.ts",

@@ -9,6 +9,7 @@ require (
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/mark3labs/mcp-go v0.54.1
+	github.com/stripe/stripe-go/v86 v86.1.0
 	golang.org/x/net v0.53.0
 	golang.org/x/oauth2 v0.36.0
 	google.golang.org/protobuf v1.36.11

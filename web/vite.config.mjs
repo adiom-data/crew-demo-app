@@ -8,6 +8,7 @@ const proxy = {
   "/auth": { target: apiTarget, changeOrigin: false },
   "/sample.v1.SampleService": { target: apiTarget, changeOrigin: false },
   "/sample.v1.PartnerService": { target: apiTarget, changeOrigin: false },
+  "/sample.v1.BillingService": { target: apiTarget, changeOrigin: false },
   "/sample.v1.OnboardingService": { target: apiTarget, changeOrigin: false },
   "/adiom.auth.v1.AuthService": { target: apiTarget, changeOrigin: false },
 };

@@ -23,6 +23,21 @@ Runtime control-flow and state machines. For the hop-by-hop data path see
   `status_changed` activity. Every create/change appends to `activities` — see
   [invariants.md](invariants.md) INV-5.
 
+## Subscription lifecycle
+```
+(none) ──CreateCheckoutSession──▶ [Stripe Checkout] ──checkout.session.completed──▶ active
+active ──customer.subscription.updated(past_due|unpaid)──▶ past_due
+active/past_due ──customer.subscription.deleted──▶ canceled
+```
+Stored as `subscription_status` on `partners`: `''` (never subscribed) | `active` | `past_due` |
+`canceled`, with `subscription_plan` ∈ `''` | `monthly` | `annual`. Empty maps to the proto
+`*_UNSPECIFIED` enum value, which the SPA renders as "Not subscribed".
+
+Only Stripe webhooks advance this state — never the RPC, which just mints a Checkout URL. Stripe
+statuses we don't surface (`trialing`, `incomplete`, …) are acknowledged and ignored. Transitions are
+idempotent and each state change appends a `subscription` activity (INV-4d, INV-5). Billing is
+disabled entirely when the Stripe env is unset; the RPC returns `CodeUnavailable` and the webhook 503s.
+
 ## Browser auth session lifecycle
 Owned by the framework `browserauth` handler (`internal/auth/browser.go`).
 ```
