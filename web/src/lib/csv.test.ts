@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { csvToPartnerRows, parseCsv } from "./csv";
+import { create } from "@bufbuild/protobuf";
+import { BillingStatus, PartnerSchema, Status, Tier } from "../gen/sample/v1/partner_pb";
+import { csvToPartnerRows, parseCsv, partnersToCsv, rowsToCsv } from "./csv";
 
 describe("parseCsv", () => {
   it("parses simple rows", () => {
@@ -66,5 +68,57 @@ describe("csvToPartnerRows", () => {
   it("tolerates ragged short rows", () => {
     const result = csvToPartnerRows("name,contact_email,company\nAcme,ops@acme.com");
     expect(result.rows[0]).toMatchObject({ name: "Acme", contactEmail: "ops@acme.com", company: "" });
+  });
+});
+
+describe("rowsToCsv", () => {
+  it("serializes simple rows", () => {
+    expect(
+      rowsToCsv([
+        ["a", "b"],
+        ["1", "2"],
+      ]),
+    ).toBe("a,b\n1,2");
+  });
+
+  it("quotes commas, newlines, CRs, and escaped quotes", () => {
+    expect(rowsToCsv([["Acme, Inc", 'she said "hi"', "line\nbreak", "carriage\rreturn"]])).toBe(
+      '"Acme, Inc","she said ""hi""","line\nbreak","carriage\rreturn"',
+    );
+  });
+});
+
+describe("partnersToCsv", () => {
+  it("exports stable headers and formatted partner fields", () => {
+    const partner = create(PartnerSchema, {
+      id: "partner-1",
+      name: "Acme, Inc",
+      contactEmail: "ops@acme.com",
+      company: "Acme Holdings",
+      region: "North\nAmerica",
+      tier: Tier.ENTERPRISE,
+      status: Status.ACTIVE,
+      billingStatus: BillingStatus.PAST_DUE,
+      createdAt: "2026-02-03T12:00:00Z",
+    });
+
+    expect(partnersToCsv([partner])).toBe(
+      [
+        "name,contact_email,company,region,tier,status,billing_status,joined",
+        '"Acme, Inc",ops@acme.com,Acme Holdings,"North\nAmerica",Enterprise,Active,Past due,"Feb 3, 2026"',
+      ].join("\n"),
+    );
+  });
+
+  it("exports empty strings for missing optional values", () => {
+    const partner = create(PartnerSchema, {
+      name: "Acme",
+      contactEmail: "ops@acme.com",
+      tier: Tier.STARTER,
+      status: Status.PENDING,
+      billingStatus: BillingStatus.TRIALING,
+    });
+
+    expect(partnersToCsv([partner]).split("\n")[1]).toBe("Acme,ops@acme.com,,,Starter,Pending,Trialing,—");
   });
 });
