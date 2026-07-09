@@ -1,3 +1,6 @@
+import type { Partner } from "../gen/sample/v1/partner_pb";
+import { billingLabel, formatDate, statusLabel, tierLabel } from "./format";
+
 // parseCsv parses RFC 4180-ish CSV text into rows of string cells. It handles
 // quoted fields, escaped quotes (""), embedded commas/newlines, and CRLF. Fully
 // blank lines are dropped.
@@ -70,6 +73,37 @@ export interface CsvPartnerRow {
   company: string;
   region: string;
   tier: string;
+}
+
+export function rowsToCsv(rows: string[][]): string {
+  return rows
+    .map((row) =>
+      row
+        .map((cell) => {
+          if (/[",\r\n]/.test(cell)) {
+            return `"${cell.replaceAll('"', '""')}"`;
+          }
+          return cell;
+        })
+        .join(","),
+    )
+    .join("\n");
+}
+
+export function partnersToCsv(partners: Partner[]): string {
+  return rowsToCsv([
+    ["name", "contact_email", "company", "region", "tier", "status", "billing_status", "joined"],
+    ...partners.map((partner) => [
+      partner.name,
+      partner.contactEmail,
+      partner.company,
+      partner.region,
+      tierLabel(partner.tier),
+      statusLabel(partner.status),
+      billingLabel(partner.billingStatus),
+      formatDate(partner.createdAt),
+    ]),
+  ]);
 }
 
 // Header aliases we accept, mapped to canonical field keys.

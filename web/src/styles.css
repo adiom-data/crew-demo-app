@@ -165,6 +165,21 @@ dd {
   color: #7b2525;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.link-button {
+  background: none;
+  border: 0;
+  color: #1d5f4c;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .error {
   background: #fff1f1;
   border: 1px solid #e6b7b7;
@@ -352,6 +367,26 @@ dd {
 }
 
 /* ---------- table ---------- */
+.dashboard-section {
+  display: grid;
+  gap: 12px;
+}
+
+.dashboard-toolbar {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-field {
+  min-width: 180px;
+}
+
+.dashboard-count {
+  align-self: center;
+}
+
 .table-wrap {
   background: #ffffff;
   border: 1px solid #d7dfd9;
@@ -579,4 +614,3 @@ code {
     grid-template-columns: 1fr;
   }
 }
-
